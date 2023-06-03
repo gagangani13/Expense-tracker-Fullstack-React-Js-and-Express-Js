@@ -1,5 +1,12 @@
 @import url("https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap");
 
+#webpage {
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(45deg, #27131c, rgba(0, 0, 0, 0.125));
+  position: fixed;
+}
+
 #container {
   width: 50vw;
   padding: 10px;
@@ -8,7 +15,9 @@
 
 h1 {
   font-family: "Permanent Marker", cursive;
+  font-size: xxx-large;
   text-align: center;
+  padding: 2rem
 }
 
 h2 {
@@ -28,11 +37,6 @@ h2 {
   color: azure;
 }
 
-#webpage {
-  width: 100vw;
-  height: 100vh;
-  background: linear-gradient(45deg, #27131c, rgba(0, 0, 0, 0.125));
-}
 
 #NavLink{
     color: aqua;
@@ -47,4 +51,15 @@ h2 {
     width: 90vw;
     left: 5vw;
   }
+}
+
+@media screen and (max-width:350px) {
+    #container {
+        width: 80vw;
+        font-size: small;
+      }
+      .layout {
+        width: 95vw;
+        left: 2.5vw;
+      }
 }
