@@ -1,12 +1,12 @@
 import { useRef, useState } from "react";
 import { Form, NavLink, Button, FloatingLabel } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
+import {  useSelector } from "react-redux";
 import { Route, Redirect } from "react-router-dom";
-import { authAction } from "../Store/authSlice";
+// import { authAction } from "../Store/authSlice";
 import axios from "axios";
 import "./login.css";
 const LOGIN = () => {
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const loginState = useSelector((state) => state.authenticate.login);
   const emailRef = useRef();
   const passwordRef = useRef();
@@ -30,24 +30,23 @@ const LOGIN = () => {
   }
   async function addData(e) {
     e.preventDefault();
+    const details={email:emailRef.current.value,password:passwordRef.current.value}
     if (!login) {
       if (passwordRef.current.value === confirmRef.current.value) {
-        const details={email:emailRef.current.value,password:passwordRef.current.value}
         const response = await axios.post('http://localhost:5000/newUser',details)
-        console.log(response);
+        const data = await response.data;
         try {
-          const data = await response.data;
-          if (data) {
+          if (response) {
             emailRef.current.value = "";
             passwordRef.current.value = "";
             confirmRef.current.value = "";
-            alert("User added");
+            alert(data.message);
             setLogin(true);
           } else {
-            throw new Error();
+            throw new Error(data.message);
           }
         } catch (error) {
-          console.log(error.response)
+          console.log(error.message)
         }
       } else {
         alert("Password not matching");
@@ -76,33 +75,24 @@ const LOGIN = () => {
         alert(data.error.message);
       }
     } else {
-      const response = await fetch(
-        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyBXPzqlI6fvUIQX7LiIqUK-vdC_dfWQ0q8`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            email: emailRef.current.value,
-            password: passwordRef.current.value,
-            returnSecureToken: true,
-          }),
-        }
-      );
-      const data = await response.json();
+      const response = await axios.post('http://localhost:5000/loginUser',details)
+
+      const data = await response.data;
       try {
-        if (response.ok) {
+        if (data.ok) {
           emailRef.current.value = "";
           passwordRef.current.value = "";
-          const token = localStorage.setItem("idToken", data.idToken);
-          const userId = localStorage.setItem("userId", data.localId);
-          dispatch(authAction.loginHandler());
-          dispatch(authAction.setToken(token));
-          dispatch(authAction.setUserId(userId));
+          // const token = localStorage.setItem("idToken", data.idToken);
+          // const userId = localStorage.setItem("userId", data.localId);
+          // dispatch(authAction.loginHandler());
+          // dispatch(authAction.setToken(token));
+          // dispatch(authAction.setUserId(userId));
           console.log(data);
         } else {
           throw new Error();
         }
       } catch (error) {
-        alert(data.error.message);
+        alert(data.message);
       }
     }
   }
