@@ -1,12 +1,12 @@
 import { useRef, useState } from "react";
 import { Form, NavLink, Button, FloatingLabel } from "react-bootstrap";
-import {  useSelector } from "react-redux";
+import {  useDispatch,useSelector } from "react-redux";
 import { Route, Redirect } from "react-router-dom";
-// import { authAction } from "../Store/authSlice";
+import { authAction } from "../Store/authSlice";
 import axios from "axios";
 import "./login.css";
 const LOGIN = () => {
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const loginState = useSelector((state) => state.authenticate.login);
   const emailRef = useRef();
   const passwordRef = useRef();
@@ -82,11 +82,11 @@ const LOGIN = () => {
         if (data.ok) {
           emailRef.current.value = "";
           passwordRef.current.value = "";
-          // const token = localStorage.setItem("idToken", data.idToken);
-          // const userId = localStorage.setItem("userId", data.localId);
-          // dispatch(authAction.loginHandler());
-          // dispatch(authAction.setToken(token));
-          // dispatch(authAction.setUserId(userId));
+          const token = localStorage.setItem("idToken", data.id);
+          const userId = localStorage.setItem("userId", data.emailId);
+          dispatch(authAction.loginHandler());
+          dispatch(authAction.setToken(token));
+          dispatch(authAction.setUserId(userId));
           console.log(data);
         } else {
           throw new Error();
@@ -100,7 +100,7 @@ const LOGIN = () => {
     <>
       <div id="webpage"></div>
       <>
-        <h1>Expense Tracker</h1>
+        <h1 id="loginH1">Expense Tracker</h1>
         <div className="layout">
           <h2 className="my-4">
             {!newPassword && (login ? "LOGIN" : "SIGN UP")}

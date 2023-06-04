@@ -39,7 +39,7 @@ module.exports.loginUser=async(req,res,next)=>{
                 throw new Error('Something went wrong')
             }
             else if (result) {
-                res.status(200).send({message:'User Logged in',ok:true})          
+                res.status(200).send({message:'User Logged in',ok:true,emailId:getUser[0].email,id:getUser[0].id})          
             } else {
                 return res.status(404).send("Incorrect password")
             }

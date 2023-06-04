@@ -7,7 +7,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { authAction } from "../Store/authSlice";
 import { expenseAction } from "../Store/expenseSlice";
 import "./toggleSwitch.css";
+import "./welcome.css"
 import { themeAction } from "../Store/themeSlice";
+import axios from "axios";
 const WELCOME = () => {
   useEffect(() => {
     const idToken = localStorage.getItem("idToken");
@@ -20,25 +22,24 @@ const WELCOME = () => {
       dispatch(authAction.setUserId(userId));
       activatePremium&&dispatch(expenseAction.setActivatePremium(true))
       premium&&dispatch(expenseAction.setPremium(true))
-      fromFirebase();
+      fromDatabase();
     }
     // eslint-disable-next-line
   }, []);
-  async function fromFirebase() {
-    const userId = localStorage.getItem("userId");
-    const response = await fetch(
-      `https://signup-and-authenticatio-f712f-default-rtdb.firebaseio.com/Users/${userId}.json`
-    );
-    const data = await response.json();
+  async function fromDatabase() {
+    // const userId = localStorage.getItem("userId");
+    const response = await axios.get('http://localhost:5000/getExpenses')
+    const data = await response.data
     try {
-      if (response.ok) {
+      if (data.ok) {
         let arr = [];
-        for (const item in data) {
+        const expense=data.expenses
+        for (const item in expense) {
           arr.unshift({
-            amount: data[item].amount,
-            description: data[item].description,
-            category: data[item].category,
-            expenseId: item,
+            amount: expense[item].amount,
+            description: expense[item].description,
+            category: expense[item].category,
+            expenseId: expense[item].id,
           });
         }
         dispatch(expenseAction.reloadExpense(arr));
@@ -125,11 +126,7 @@ const WELCOME = () => {
 
   return (
     <>
-    <div style={{   backgroundColor: light?'#dbe4e7':'currentcolor',
-      height: '100vh',
-      position: 'fixed',
-      width: '100vw',}}>
-    </div>
+    <div className="background"></div>
     <>
       {login && (
         <>
@@ -137,11 +134,10 @@ const WELCOME = () => {
             expand="sm"
             variant="dark"
             className="position-fixed w-100 text-l"
-            style={{ zIndex: "5", border: "solid" ,color:light?'black':'white',backgroundColor:light?'#bdcfc7':'black'}}
+            id="Navbar"
           >
             <Container>
-              <h1>Welcome To Expense Tracker</h1>
-
+              <h1 id="welcomeH1">Welcome To Expense Tracker</h1>
               <NavLink style={{ color: light?"blue":'white' }} onClick={setProfileHandler}>
                 View Profile
               </NavLink>

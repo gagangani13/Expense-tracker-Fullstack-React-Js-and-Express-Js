@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+.background{
+    background-color:#dbe4e7;
+    height: 100vh;
+    position: fixed;
+    width: 100vw;
+}
+#Navbar{ 
+    z-index: 5;
+    border: solid;
+    color: black;
+    height: 7rem;
+    background-color: #8dc627f0;
+    box-shadow: 0 2px 5px black;
+}
+#welcomeH1{
+    font-family: 'Orbitron', sans-serif;
+}

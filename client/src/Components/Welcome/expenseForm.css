@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Geologica:wght@300&family=Orbitron:wght@500&display=swap');
+.form{
+    margin: 1rem 0rem;
+    background-color: #bdcfc7;
+    padding: 1rem;
+    border-radius: 1rem;
+    color: black;
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+    column-gap: 5px;
+}
+
+.welcomeLayout{
+    position: absolute;
+    top: 8rem;
+    text-align: center;
+    width: 80vw;
+    left: 10vw;
+    font-family: 'Geologica', sans-serif;
+}
