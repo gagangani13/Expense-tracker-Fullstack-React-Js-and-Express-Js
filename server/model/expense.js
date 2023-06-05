@@ -1,6 +1,6 @@
 const { INTEGER, STRING } = require('sequelize');
 const database=require('../database/database');
-module.exports.Expense=database.define('Expense',{
+const Expense=database.define('Expense',{
     id:{
         primaryKey:true,
         type:INTEGER,
@@ -19,3 +19,5 @@ module.exports.Expense=database.define('Expense',{
         type:STRING
     }
 })
+
+module.exports.Expense=Expense;

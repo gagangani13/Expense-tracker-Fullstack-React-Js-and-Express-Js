@@ -1,5 +1,9 @@
 const {User}=require('../model/user')
 const bcrypt=require('bcrypt')
+const jwt=require('jsonwebtoken')
+function userEncrypt(id){
+    return jwt.sign(id,'ufhuebfdnvddsd8t4y48irnigmv04t409g0bjmbwbfknbknnrgjbg')
+}
 module.exports.newUser=async(req,res,next)=>{
     if(!req.body.email || !req.body.password){
         return res.status(400).json({err:'Invalid Input'})
@@ -27,24 +31,21 @@ module.exports.loginUser=async(req,res,next)=>{
     const email=req.body.email
     const password=req.body.password
     if(!email || !password){
-        return res.status(400).send({message:'Invalid Input',ok:false})
+        return res.status(200).send({message:'Invalid Input',ok:false})
     }
     try {
         const getUser=await User.findAll({where:{email:email}})
-        if(!getUser){
-            throw new Error("User doesn't exists")
-        }
         bcrypt.compare(password,getUser[0].password,(err,result)=>{
             if (err) {
                 throw new Error('Something went wrong')
             }
             else if (result) {
-                res.status(200).send({message:'User Logged in',ok:true,emailId:getUser[0].email,id:getUser[0].id})          
+                res.status(200).send({message:'User Logged in',ok:true,emailId:getUser[0].email,id:getUser[0].id,idToken:userEncrypt(getUser[0].id)})          
             } else {
-                return res.status(404).send("Incorrect password")
+                res.status(200).send({message:'Incorrect password',ok:false})
             }
         })
     } catch (error) {
-        res.status(404).send({message:error.message,ok:false})
+        res.status(200).send({message:"User doesn't exists",ok:false})
     }
 }

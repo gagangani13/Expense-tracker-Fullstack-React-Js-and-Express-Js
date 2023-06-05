@@ -9,7 +9,8 @@ module.exports.addExpense=async(req,res,next)=>{
         const addExpense=await Expense.create({
             amount:amount,
             description:description,
-            category:category
+            category:category,
+            UserId:req.userId
         })
         res.status(201).send({message:'Expense added',ok:true,id:addExpense.id})
     } catch (error) {
@@ -19,7 +20,7 @@ module.exports.addExpense=async(req,res,next)=>{
 
 module.exports.getExpenses=async(req,res,next)=>{
     try {      
-        const expenses=await Expense.findAll()
+        const expenses=await Expense.findAll({where:{UserId:req.userId}})
         res.status(200).send({ok:true,expenses:expenses})
     } catch (error) {
         res.status(500).send({message:'Error'})

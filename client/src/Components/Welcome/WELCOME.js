@@ -27,8 +27,8 @@ const WELCOME = () => {
     // eslint-disable-next-line
   }, []);
   async function fromDatabase() {
-    // const userId = localStorage.getItem("userId");
-    const response = await axios.get('http://localhost:5000/getExpenses')
+    const token = localStorage.getItem("idToken");
+    const response = await axios.get('http://localhost:5000/getExpenses',{headers:{'Authorization':token}})
     const data = await response.data
     try {
       if (data.ok) {

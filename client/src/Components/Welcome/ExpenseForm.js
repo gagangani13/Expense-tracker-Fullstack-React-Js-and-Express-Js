@@ -9,6 +9,7 @@ const ExpenseForm = () => {
   const expenses = useSelector((state) => state.expenseList.expenses);
   const editing = useSelector((state) => state.expenseList.editing);
   const userId = useSelector((state) => state.authenticate.userId);
+  const token=useSelector((state)=>state.authenticate.idToken)
   const light = useSelector((state) => state.theme.light);
   const [load, setLoad] = useState(false);
   const amountRef = useRef();
@@ -24,7 +25,7 @@ const ExpenseForm = () => {
       category: categoryRef.current.value,
     };
     if (editing === null) {
-      const response = await axios.post('http://localhost:5000/addExpense',details)
+      const response = await axios.post('http://localhost:5000/addExpense',details,{headers:{'Authorization':token}})
       const data = await response.data
       try {
         setLoad(false);

@@ -82,7 +82,7 @@ const LOGIN = () => {
         if (data.ok) {
           emailRef.current.value = "";
           passwordRef.current.value = "";
-          const token = localStorage.setItem("idToken", data.id);
+          const token = localStorage.setItem("idToken", data.idToken);
           const userId = localStorage.setItem("userId", data.emailId);
           dispatch(authAction.loginHandler());
           dispatch(authAction.setToken(token));
