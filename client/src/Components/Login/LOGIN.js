@@ -11,6 +11,7 @@ const LOGIN = () => {
   const emailRef = useRef();
   const passwordRef = useRef();
   const confirmRef = useRef();
+  const nameRef=useRef();
   const [login, setLogin] = useState(true);
   const [newPassword, setNewPassword] = useState(false);
 
@@ -33,10 +34,11 @@ const LOGIN = () => {
     const details={email:emailRef.current.value,password:passwordRef.current.value}
     if (!login) {
       if (passwordRef.current.value === confirmRef.current.value) {
-        const response = await axios.post('http://localhost:5000/newUser',details)
+        const response = await axios.post('http://localhost:5000/newUser',{...details,name:nameRef.current.value})
         const data = await response.data;
         try {
           if (response) {
+            nameRef.current.value="";
             emailRef.current.value = "";
             passwordRef.current.value = "";
             confirmRef.current.value = "";
@@ -84,10 +86,11 @@ const LOGIN = () => {
           passwordRef.current.value = "";
           const token = localStorage.setItem("idToken", data.idToken);
           const userId = localStorage.setItem("userId", data.emailId);
+          const premium=localStorage.setItem('premium',data.premium)
           dispatch(authAction.loginHandler());
           dispatch(authAction.setToken(token));
           dispatch(authAction.setUserId(userId));
-          console.log(data);
+          dispatch(authAction.setActivatePremium(premium))
         } else {
           throw new Error();
         }
@@ -108,7 +111,22 @@ const LOGIN = () => {
           </h2>
           <div id="container">
             {newPassword && <p>Enter the registered Email</p>}
+
             <Form className="d-grid" onSubmit={addData}>
+            {!login && (
+                <FloatingLabel
+                  controlId="floatingInput"
+                  label="Name"
+                  className="mb-3 text-dark"
+                >
+                  <Form.Control
+                    type="text"
+                    placeholder="Enter your name"
+                    ref={nameRef}
+                    required
+                  />
+                </FloatingLabel>
+              )}
               <FloatingLabel
                 controlId="floatingInput"
                 label="Email"

@@ -1,6 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap");
 .background{
-    background-color:#dbe4e7;
+    background: linear-gradient(60deg, #999e8b, #8caebec9);
     height: 100vh;
     position: fixed;
     width: 100vw;
@@ -14,5 +14,5 @@
     box-shadow: 0 2px 5px black;
 }
 #welcomeH1{
-    font-family: 'Orbitron', sans-serif;
+    font-family: "Permanent Marker", cursive;
 }

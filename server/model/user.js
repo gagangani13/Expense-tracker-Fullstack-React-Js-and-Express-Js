@@ -15,5 +15,6 @@ module.exports.User=database.define('User',{
         allowNull:false,
         type:STRING
     },
+    name:STRING,
     premium:BOOLEAN
 })

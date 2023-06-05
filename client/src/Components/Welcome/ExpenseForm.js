@@ -15,7 +15,6 @@ const ExpenseForm = () => {
   const amountRef = useRef();
   const descriptionRef = useRef();
   const categoryRef = useRef();
-  let totalAmount = 0;
   async function addExpenses(e) {
     e.preventDefault();
     setLoad(true);
@@ -149,14 +148,6 @@ const ExpenseForm = () => {
       <>
         {load && <h5>Loading...</h5>}
         {expenses.map((item) => {
-          totalAmount += Number(item.amount);
-          if (totalAmount >= 10000) {
-            dispatch(expenseAction.setPremium(true));
-            localStorage.setItem("premium", true);
-          } else {
-            dispatch(expenseAction.setPremium(false));
-            localStorage.setItem("premium", false);
-          }
           return (
             <Card className="mb-2">
               <Card.Body

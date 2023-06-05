@@ -1,4 +1,5 @@
 const { Expense } = require("../model/expense")
+const { User } = require("../model/user")
 
 module.exports.addExpense=async(req,res,next)=>{
     const{amount,description,category}=req.body

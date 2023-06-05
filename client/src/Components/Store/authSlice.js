@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-const initialAuthState={login:false,idToken:'',userId:''}
+const initialAuthState={login:false,idToken:'',userId:'',activatePremium:false}
 const authSlice=createSlice({
     name:'authentication',
     initialState:initialAuthState,
@@ -15,6 +15,9 @@ const authSlice=createSlice({
         },
         setUserId(state,action){
             state.userId=action.payload
+        },
+        setActivatePremium(state,action){
+            state.activatePremium=action.payload
         }
     }
 })

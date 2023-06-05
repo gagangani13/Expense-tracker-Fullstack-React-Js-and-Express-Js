@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Geologica:wght@300&family=Orbitron:wght@500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Geologica:wght@300&family=Orbitron:wght@500&display=swap');
 .form{
     margin: 1rem 0rem;
     background-color: #bdcfc7;
@@ -17,4 +17,8 @@
     width: 80vw;
     left: 10vw;
     font-family: 'Geologica', sans-serif;
+}
+
+h3{
+    font-family: 'Cherry Bomb One', cursive;
 }

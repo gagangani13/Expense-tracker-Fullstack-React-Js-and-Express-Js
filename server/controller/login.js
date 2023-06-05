@@ -11,13 +11,15 @@ module.exports.newUser=async(req,res,next)=>{
     try {
         const email=req.body.email
         const password=req.body.password
+        const name=req.body.name
         bcrypt.hash(password,10,async(err,result)=>{
             if (err){
                 throw new Error()
             }
             const createUser=await User.create({
                 email:email,
-                password:result
+                password:result,
+                name:name
             })
             console.log(createUser);
             res.status(201).json({message:"User Added"})
@@ -40,7 +42,7 @@ module.exports.loginUser=async(req,res,next)=>{
                 throw new Error('Something went wrong')
             }
             else if (result) {
-                res.status(200).send({message:'User Logged in',ok:true,emailId:getUser[0].email,id:getUser[0].id,idToken:userEncrypt(getUser[0].id)})          
+                res.status(200).send({message:'User Logged in',ok:true,emailId:getUser[0].email,id:getUser[0].id,idToken:userEncrypt(getUser[0].id),premium:getUser[0].premium})          
             } else {
                 res.status(200).send({message:'Incorrect password',ok:false})
             }
