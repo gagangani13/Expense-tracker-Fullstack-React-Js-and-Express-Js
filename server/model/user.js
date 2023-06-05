@@ -1,5 +1,5 @@
 const database=require('../database/database');
-const {Sequelize, INTEGER, STRING}=require('sequelize')
+const {Sequelize, INTEGER, STRING, BOOLEAN}=require('sequelize')
 module.exports.User=database.define('User',{
     id:{
         type:INTEGER,
@@ -14,5 +14,6 @@ module.exports.User=database.define('User',{
     password:{
         allowNull:false,
         type:STRING
-    }
+    },
+    premium:BOOLEAN
 })
