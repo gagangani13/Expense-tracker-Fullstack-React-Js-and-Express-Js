@@ -76,7 +76,7 @@ const ExpenseForm = () => {
     setLoad(true);
     const key = Number(e.target.parentElement.id);
     console.log(userId, key);
-    const response = await axios.delete(`http://localhost:5000/deleteExpense/${key}`)
+    const response = await axios.delete(`http://localhost:5000/deleteExpense/${key}`,{headers:{'Authorization':token}})
     const data = await response.data;
     try {
       console.log(data);

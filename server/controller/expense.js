@@ -1,7 +1,9 @@
+const database = require("../database/database")
 const { Expense } = require("../model/expense")
 const { User } = require("../model/user")
 
 module.exports.addExpense=async(req,res,next)=>{
+    const t=await database.transaction();
     const{amount,description,category}=req.body
     if(!amount||!description||!category){
         return res.status(400).send({message:'Invalid input'})
@@ -12,12 +14,18 @@ module.exports.addExpense=async(req,res,next)=>{
             description:description,
             category:category,
             UserId:req.userId
-        })
+        },{transaction:t})
         const getUser=await User.findByPk(req.userId)
         const totalAmount=Number(getUser.totalExpense)+Number(amount)
-        const updateExpense=await getUser.update({totalExpense:totalAmount})
-        res.status(201).send({message:'Expense added',ok:true,id:addExpense.id})
+        const updateExpense=await getUser.update({totalExpense:totalAmount},{transaction:t})
+        try {
+            await t.commit()
+            res.status(201).send({message:'Expense added',ok:true,id:addExpense.id})
+        } catch (error) {
+            throw new Error()
+        }
     } catch (error) {
+        await t.rollback()
         res.status(400).send({message:'Expense not added',ok:false})
     }
 }
@@ -32,15 +40,21 @@ module.exports.getExpenses=async(req,res,next)=>{
 }
 
 module.exports.deleteExpense=async(req,res,next)=>{
+    const t=await database.transaction()
     try {
-        const findId=await Expense.findByPk(req.params.Id)
-        const deleteId=await findId.destroy()
+        const findExpense=await Expense.findByPk(req.params.Id)
+        const findUser=await User.findByPk(req.userId)
+        const removeExpense=Number(findUser.totalExpense)-Number(findExpense.amount)
+        const updateUser=await findUser.update({totalExpense:removeExpense},{transaction:t})
+        const deleteId=await findExpense.destroy({transaction:t})
         try {
+            await t.commit()
             res.status(200).send({ok:true,message:'Deleted'})
         } catch (error) {
             throw new Error()
         }
     } catch (error) {
+        await t.rollback()
         res.status(500).send({ok:false,message:'failed'})
     }
 }

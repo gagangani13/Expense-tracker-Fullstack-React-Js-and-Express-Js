@@ -10,7 +10,7 @@ router.post('/loginUser',login.loginUser)
 
 router.post('/addExpense',user.tokenDecrypt,expense.addExpense)
 router.get('/getExpenses',user.tokenDecrypt,expense.getExpenses)
-router.delete('/deleteExpense/:Id',expense.deleteExpense)
+router.delete('/deleteExpense/:Id',user.tokenDecrypt,expense.deleteExpense)
 
 router.get('/purchasePremium',user.tokenDecrypt,purchase.PurchasePremium)
 router.post('/updateTransactionStatus',user.tokenDecrypt,purchase.updateTransactionStatus)
