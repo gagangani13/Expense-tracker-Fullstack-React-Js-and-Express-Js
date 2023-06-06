@@ -13,6 +13,9 @@ module.exports.addExpense=async(req,res,next)=>{
             category:category,
             UserId:req.userId
         })
+        const getUser=await User.findByPk(req.userId)
+        const totalAmount=Number(getUser.totalExpense)+Number(amount)
+        const updateExpense=await getUser.update({totalExpense:totalAmount})
         res.status(201).send({message:'Expense added',ok:true,id:addExpense.id})
     } catch (error) {
         res.status(400).send({message:'Expense not added',ok:false})

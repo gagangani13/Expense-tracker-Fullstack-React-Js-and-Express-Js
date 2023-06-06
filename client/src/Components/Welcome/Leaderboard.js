@@ -13,10 +13,12 @@ const Leaderboard =  () => {
         try {
             let arr = [];
             for (let element in data) {
-                arr.push({ name: data[element].name, amount: data[element].amount?data[element].amount:0, order:Number(element)+1 });
+                arr.push({ name: data[element].name, totalExpense: data[element].totalExpense?data[element].totalExpense:0, order:Number(element)+1 });
             }
             loadExpenses(arr);
-        } catch (error) {}
+        } catch (error) {
+          console.log(error);
+        }
     }
     useEffect(()=>{
         leaderboardExpenses()
@@ -28,13 +30,13 @@ const Leaderboard =  () => {
       <li id='listItem'>
         <span id='spanLeaderboard'>Rank</span>
         <span id='spanLeaderboard'>User</span>
-        <span id='spanLeaderboard'>Amount</span>
+        <span id='spanLeaderboard'>Total</span>
       </li>
         {expenses.map((item) => {
           return <li id='listItem'>
             <span id='spanLeaderboard'>{item.order}</span>
             <span id='spanLeaderboard'>{item.name}</span>
-            <span id='spanLeaderboard'>{item.amount}</span>
+            <span id='spanLeaderboard'>{item.totalExpense}</span>
             </li>;
         })}
     </div>

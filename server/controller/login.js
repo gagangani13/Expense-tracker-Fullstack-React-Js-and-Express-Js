@@ -19,7 +19,8 @@ module.exports.newUser=async(req,res,next)=>{
             const createUser=await User.create({
                 email:email,
                 password:result,
-                name:name
+                name:name,
+                totalExpense:0
             })
             console.log(createUser);
             res.status(201).json({message:"User Added"})
