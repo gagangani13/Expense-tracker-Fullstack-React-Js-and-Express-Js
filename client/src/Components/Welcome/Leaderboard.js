@@ -13,7 +13,7 @@ const Leaderboard =  () => {
         try {
             let arr = [];
             for (let element in data) {
-                arr.push({ name: data[element].name, amount: data[element].amount, order:Number(element)+1 });
+                arr.push({ name: data[element].name, amount: data[element].amount?data[element].amount:0, order:Number(element)+1 });
             }
             loadExpenses(arr);
         } catch (error) {}
@@ -25,6 +25,11 @@ const Leaderboard =  () => {
   return (
     <div id='leaderboard'>
       <h1 id='leaderH1'>Leaderboard</h1>
+      <li id='listItem'>
+        <span id='spanLeaderboard'>Rank</span>
+        <span id='spanLeaderboard'>User</span>
+        <span id='spanLeaderboard'>Amount</span>
+      </li>
         {expenses.map((item) => {
           return <li id='listItem'>
             <span id='spanLeaderboard'>{item.order}</span>
