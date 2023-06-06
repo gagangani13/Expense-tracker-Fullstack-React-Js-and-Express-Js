@@ -7,6 +7,7 @@ const purchase=require('../controller/purchase')
 const premium=require('../controller/premium')
 router.post('/newUser',login.newUser)
 router.post('/loginUser',login.loginUser)
+router.post('/forgotPassword',login.forgotPassword)
 
 router.post('/addExpense',user.tokenDecrypt,expense.addExpense)
 router.get('/getExpenses',user.tokenDecrypt,expense.getExpenses)

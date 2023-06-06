@@ -31,10 +31,9 @@ const LOGIN = () => {
   }
   async function addData(e) {
     e.preventDefault();
-    const details={email:emailRef.current.value,password:passwordRef.current.value}
     if (!login) {
       if (passwordRef.current.value === confirmRef.current.value) {
-        const response = await axios.post('http://localhost:5000/newUser',{...details,name:nameRef.current.value})
+        const response = await axios.post('http://localhost:5000/newUser',{email:emailRef.current.value,password:passwordRef.current.value,name:nameRef.current.value})
         const data = await response.data;
         try {
           if (response) {
@@ -54,30 +53,21 @@ const LOGIN = () => {
         alert("Password not matching");
       }
     } else if (login && newPassword) {
-      const response = await fetch(
-        `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyBXPzqlI6fvUIQX7LiIqUK-vdC_dfWQ0q8`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            requestType: "PASSWORD_RESET",
-            email: emailRef.current.value,
-          }),
-        }
-      );
-      const data = await response.json();
+      const response = await axios.post('http://www.localhost:5000/forgotPassword',{email:emailRef.current.value});
+      const data = await response.data;
       try {
-        if (response.ok) {
-          alert("Email sent");
+        if (data.ok) {
           setNewPassword(false);
           emailRef.current.value = "";
         } else {
           throw new Error();
         }
       } catch (error) {
-        alert(data.error.message);
+        console.log(error);
       }
+      alert(data.message);
     } else {
-      const response = await axios.post('http://localhost:5000/loginUser',details)
+      const response = await axios.post('http://localhost:5000/loginUser',{email:emailRef.current.value,password:passwordRef.current.value})
 
       const data = await response.data;
       try {
