@@ -3,8 +3,10 @@
 #webpage {
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(45deg, #27131c, rgba(0, 0, 0, 0.125));
   position: fixed;
+  background-image: url("money.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 #container {
@@ -17,29 +19,32 @@
   font-family: "Permanent Marker", cursive;
   font-size: xxx-large;
   text-align: center;
-  padding: 2rem
+  padding: 2rem;
+  position: absolute;
+  width: 100vw;
+  color: beige;
+  background: linear-gradient(45deg, black, transparent);
 }
 
 h2 {
-  color: aqua;
+  color: azure;
   text-align: center;
 }
 
 .layout {
-  top: 20vh;
+  top: 25vh;
   position: absolute;
-  background-color: #3037384f;
-  width: 60vw;
+  width: 50vw;
   margin: auto;
-  left: 20vw;
   box-shadow: 0 2px 5px #080809;
   border-radius: 1rem;
   color: azure;
+  left: 25vw;
+  background: linear-gradient(187deg, black, #3c432ca6);
 }
 
-
-#NavLink{
-    color: aqua;
+#NavLink {
+  color: aqua;
 }
 
 @media screen and (max-width: 700px) {
@@ -48,18 +53,20 @@ h2 {
     font-size: large;
   }
   .layout {
+    top:25vh;
     width: 90vw;
     left: 5vw;
   }
 }
 
-@media screen and (max-width:350px) {
-    #container {
-        width: 80vw;
-        font-size: small;
-      }
-      .layout {
-        width: 95vw;
-        left: 2.5vw;
-      }
+@media screen and (max-width: 350px) {
+  #container {
+    width: 80vw;
+    font-size: small;
+  }
+  .layout {
+    top:30vh;
+    width: 95vw;
+    left: 2.5vw;
+  }
 }

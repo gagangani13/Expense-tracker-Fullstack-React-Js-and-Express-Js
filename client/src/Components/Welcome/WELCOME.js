@@ -10,6 +10,8 @@ import "./welcome.css";
 import { themeAction } from "../Store/themeSlice";
 import axios from "axios";
 import Leaderboard from "./Leaderboard";
+import Downloads from "./Downloads";
+import ToggleSwitch from "./ToggleSwitch";
 
 const WELCOME = () => {
   useEffect(() => {
@@ -21,42 +23,18 @@ const WELCOME = () => {
       dispatch(authAction.setToken(idToken));
       dispatch(authAction.setUserId(userId));
       activatePremium!=='null' && dispatch(authAction.setActivatePremium(true));
-      fromDatabase();
     }
     // eslint-disable-next-line
   }, []);
-  async function fromDatabase() {
-    const token = localStorage.getItem("idToken");
-    const response = await axios.get("http://localhost:5000/getExpenses", {
-      headers: { Authorization: token },
-    });
-    const data = await response.data;
-    try {
-      if (data.ok) {
-        let arr = [];
-        const expense = data.expenses;
-        for (const item in expense) {
-          arr.unshift({
-            amount: expense[item].amount,
-            description: expense[item].description,
-            category: expense[item].category,
-            expenseId: expense[item].id,
-          });
-        }
-        dispatch(expenseAction.reloadExpense(arr));
-      } else {
-        throw new Error();
-      }
-    } catch (error) {
-      alert(data.error.message);
-    }
-  }
+    
   const login = useSelector((state) => state.authenticate.login);
   const light = useSelector((state) => state.theme.light);
   const activatePremium = useSelector((state) => state.authenticate.activatePremium);
   const idToken = useSelector((state) => state.authenticate.idToken);
   const dispatch = useDispatch();
   const [leaderboard,setLeaderboard]=useState(false)
+  const[viewDownloads,setViewDownloads]=useState(false)
+  const [addExpense,setAddExpense]=useState(true)
 
   function logoutHandler() {
     dispatch(authAction.logoutHandler());
@@ -69,7 +47,6 @@ const WELCOME = () => {
   function setTheme() {
     dispatch(themeAction.setLight());
   }
-
   async function activation(e) {
     if (activatePremium && !light) {
       dispatch(themeAction.setLight());
@@ -116,11 +93,22 @@ const WELCOME = () => {
       dispatch(expenseAction.setActivatePremium(false));
     }
   }
-
   function showLeaderboard() {
     setLeaderboard(!leaderboard)
+    viewDownloads&&setViewDownloads(false)
+    addExpense&&setAddExpense(false)
   }
-
+  function setDownloads(){
+    setViewDownloads(!viewDownloads)
+    leaderboard&&setLeaderboard(false)
+    addExpense&&setAddExpense(false)
+  }
+  function showExpense() {
+    setAddExpense(!addExpense)
+    leaderboard&&setLeaderboard(false)
+    viewDownloads&&setViewDownloads(false)
+  }
+  // !viewDownloads&&!leaderboard&&!addExpense&&setAddExpense(true)
   async function downloadExpenses(e) {
     const response=await axios.get('http://localhost:5000/downloadAWS',{headers:{'Authorization':idToken}})
     const data=await response.data
@@ -151,30 +139,16 @@ const WELCOME = () => {
               <Container>
                 <h1 id="welcomeH1">Expense Tracker</h1>
 
-                {activatePremium && (
-                  <div>
-                    <i
-                      class="fa-solid fa-sun fa-lg"
-                      style={{ verticalAlign: "middle" }}
-                    ></i>
-                    <label class="switch">
-                      <input type="checkbox" onClick={setTheme} />
-                      <span class="slider round"></span>
-                    </label>
-                    <i
-                      class="fa-solid fa-moon fa-lg"
-                      style={{ verticalAlign: "middle" }}
-                    ></i>
-                  </div>
-                )}
+                {activatePremium && <ToggleSwitch setTheme={setTheme}/>}
 
                 {!activatePremium && (
                   <Button variant="success" type="button" onClick={activation}>
                     Activate Premium
                   </Button>
                 )}
-
-                {activatePremium&&<NavLink onClick={showLeaderboard}>{leaderboard?'Add expenses':'Leaderboard'}</NavLink>}
+                {activatePremium&&<NavLink className='activeLink' onClick={showExpense}>ADD EXPENSE</NavLink>}
+                {activatePremium&&<NavLink className='activeLink' onClick={showLeaderboard}>LEADERBOARD</NavLink>}
+                {activatePremium&&<NavLink className='activeLink' onClick={setDownloads}>VIEW DOWNLOADS</NavLink>}
                 {activatePremium && (
                   <Button type='button' onClick={downloadExpenses}>
                     <i class="fa-solid fa-download fa-lg"></i>
@@ -186,8 +160,9 @@ const WELCOME = () => {
                 </Button>
               </Container>
             </Navbar>
-            {!leaderboard&&<ExpenseForm />}
+            {addExpense&&<ExpenseForm />}
             {leaderboard&&<Leaderboard/>}
+            {viewDownloads&&<Downloads/>}
           </>
         )}
         {!login && (
@@ -196,6 +171,7 @@ const WELCOME = () => {
           </Route>
         )}
       </>
+  
     </>
   );
 };

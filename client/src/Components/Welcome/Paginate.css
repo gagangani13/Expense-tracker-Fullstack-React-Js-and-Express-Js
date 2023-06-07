@@ -1,0 +1,12 @@
+.paginate{
+    position: relative;
+    top: 2vh;
+    width: 25vw;
+    text-align-last: center;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+}
+.selection{
+    width: 5rem;
+}

@@ -6,7 +6,7 @@
     border-radius: 1rem;
     color: black;
     display: grid;
-    grid-template-columns: auto auto auto auto;
+    grid-template-columns: auto auto auto auto auto;
     column-gap: 5px;
 }
 

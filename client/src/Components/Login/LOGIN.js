@@ -92,7 +92,7 @@ const LOGIN = () => {
   return (
     <>
       <div id="webpage"></div>
-      <>
+      <div>
         <h1 id="loginH1">Expense Tracker</h1>
         <div className="layout">
           <h2 className="my-4">
@@ -199,7 +199,7 @@ const LOGIN = () => {
             )}
           </div>
         </div>
-      </>
+      </div>
     </>
   );
 };

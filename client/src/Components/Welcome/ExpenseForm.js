@@ -1,20 +1,65 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Card, Form, Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { expenseAction } from "../Store/expenseSlice";
 import "./expenseForm.css";
 import axios from "axios";
+import Paginate from "./Paginate";
+
+var pageData={}
+var pageSize=localStorage.getItem('size')||2
+var currPage=localStorage.getItem('currentPage')||1
 const ExpenseForm = () => {
   const dispatch = useDispatch();
   const expenses = useSelector((state) => state.expenseList.expenses);
   const editing = useSelector((state) => state.expenseList.editing);
   const userId = useSelector((state) => state.authenticate.userId);
-  const token=useSelector((state)=>state.authenticate.idToken)
+  const token = useSelector((state) => state.authenticate.idToken);
   const light = useSelector((state) => state.theme.light);
   const [load, setLoad] = useState(false);
   const amountRef = useRef();
   const descriptionRef = useRef();
   const categoryRef = useRef();
+  const dateRef=useRef();
+  useEffect(()=>{
+    console.log(currPage,pageSize);
+    document.getElementById('pageSize').value=pageSize
+    getExpenses(currPage,pageSize)
+    // eslint-disable-next-line
+  },[])
+
+  async function getExpenses(currPage=1,size=2) {
+    const token = localStorage.getItem("idToken");
+    const response = await axios.get(`http://localhost:5000/getExpenses?page=${currPage}&size=${size}`, {
+      headers: { Authorization: token },
+    });
+    const data = await response.data;
+    try {
+      console.log(data);
+      if (data.ok) {
+        localStorage.setItem('currentPage',currPage)
+        localStorage.setItem('size',size)
+        pageData=data
+        pageSize=size
+        currPage=data.currentPage
+        let arr = [];
+        const expense = data.expenses;
+        for (const item in expense) {
+          arr.push({
+            amount: expense[item].amount,
+            description: expense[item].description,
+            category: expense[item].category,
+            expenseId: expense[item].id,
+          });
+        }
+        dispatch(expenseAction.reloadExpense(arr));
+      } else {
+        throw new Error();
+      }
+    } catch (error) {
+      alert(data.error.message);
+    }
+  }
   async function addExpenses(e) {
     e.preventDefault();
     setLoad(true);
@@ -22,24 +67,29 @@ const ExpenseForm = () => {
       amount: amountRef.current.value,
       description: descriptionRef.current.value,
       category: categoryRef.current.value,
+      date:dateRef.current.value
     };
     if (editing === null) {
-      const response = await axios.post('http://localhost:5000/addExpense',details,{headers:{'Authorization':token}})
-      const data = await response.data
-      try {
-        setLoad(false);
-        if (data.ok) {
+      const response = await axios.post(
+        "http://localhost:5000/addExpense",
+        details,
+        { headers: { Authorization: token } }
+        );
+        const data = await response.data;
+        try {
+          setLoad(false);
+          if (data.ok) {
           details = { ...details, expenseId: data.id };
           amountRef.current.value = "";
           descriptionRef.current.value = "";
           categoryRef.current.value = "";
-          console.log(details);
+          dateRef.current.value="";
           dispatch(expenseAction.loadExpenses(details));
+          getExpenses(1,pageSize)
         } else {
           throw new Error();
         }
       } catch (error) {
-        console.log(data);
         alert(data.error.message);
       }
     } else {
@@ -57,6 +107,7 @@ const ExpenseForm = () => {
           amountRef.current.value = "";
           descriptionRef.current.value = "";
           categoryRef.current.value = "";
+          dateRef.current.value="";
           const editArray = expenses.filter((item) => {
             return item.expenseId !== editing;
           });
@@ -67,7 +118,6 @@ const ExpenseForm = () => {
           throw new Error();
         }
       } catch (error) {
-        console.log(data);
         alert(data.error.message);
       }
     }
@@ -76,14 +126,17 @@ const ExpenseForm = () => {
     setLoad(true);
     const key = Number(e.target.parentElement.id);
     console.log(userId, key);
-    const response = await axios.delete(`http://localhost:5000/deleteExpense/${key}`,{headers:{'Authorization':token}})
+    const response = await axios.delete(
+      `http://localhost:5000/deleteExpense/${key}`,
+      { headers: { Authorization: token } }
+    );
     const data = await response.data;
     try {
       console.log(data);
       setLoad(false);
       if (data.ok) {
         const deleteArray = expenses.filter((item) => {
-          console.log(item.expenseId,key);
+          console.log(item.expenseId, key);
           return item.expenseId !== key;
         });
         console.log(deleteArray);
@@ -118,9 +171,9 @@ const ExpenseForm = () => {
   }
   return (
     <div className="welcomeLayout">
+      {console.log('run')}
       <h3>ADD EXPENSES</h3>
       <Form className="form" onSubmit={addExpenses}>
-
         <Form.Control
           placeholder="Amount"
           type="number"
@@ -134,6 +187,8 @@ const ExpenseForm = () => {
           ref={descriptionRef}
           required
         />
+
+        <Form.Control type="date" name="dob" placeholder="Date of Expense" ref={dateRef} required/>
 
         <Form.Select defaultValue="Me" ref={categoryRef} required>
           <option>Me</option>
@@ -182,6 +237,7 @@ const ExpenseForm = () => {
           );
         })}
       </>
+      <Paginate data={pageData} onChangePage={getExpenses} onChangeSize={getExpenses}/>
     </div>
   );
 };

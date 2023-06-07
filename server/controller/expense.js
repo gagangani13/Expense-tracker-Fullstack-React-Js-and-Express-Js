@@ -1,6 +1,6 @@
 const database = require("../database/database")
 const { Expense } = require("../model/expense")
-const { User } = require("../model/user")
+const { User } = require("../model/user");
 
 module.exports.addExpense=async(req,res,next)=>{
     const t=await database.transaction();
@@ -31,9 +31,29 @@ module.exports.addExpense=async(req,res,next)=>{
 }
 
 module.exports.getExpenses=async(req,res,next)=>{
-    try {      
-        const expenses=await Expense.findAll({where:{UserId:req.userId}})
-        res.status(200).send({ok:true,expenses:expenses})
+    try {     
+        const itemsPerPage=Number(req.query.size)||2;
+        let page=Number(req.query.page)
+        const count=await Expense.count({where:{UserId:req.userId}})
+        while ((itemsPerPage*(page-1)>=count)&&page>1){
+            page-=1
+        }
+        const offset=itemsPerPage*(page-1)
+        if((offset)<=count){
+            const expenses=await Expense.findAll({where:{UserId:req.userId},
+                offset:offset,
+                limit:itemsPerPage,
+                order:[['createdAt','DESC']]
+            })
+            res.send({
+                ok:true,
+                currentPage:page,
+                previousPage:page-1,
+                nextPage:page+1,
+                expenses:expenses,
+                lastPage:Math.ceil(count/itemsPerPage)
+            })
+        }
     } catch (error) {
         res.status(500).send({message:'Error'})
     }
@@ -57,4 +77,8 @@ module.exports.deleteExpense=async(req,res,next)=>{
         await t.rollback()
         res.status(500).send({ok:false,message:'failed'})
     }
+}
+
+module.exports.pagination=async(req,res,next)=>{
+
 }

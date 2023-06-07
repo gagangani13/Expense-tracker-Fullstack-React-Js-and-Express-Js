@@ -16,3 +16,7 @@
 #welcomeH1{
     font-family: "Permanent Marker", cursive;
 }
+
+.activeLink:hover{
+    font-family: "Permanent Marker", cursive;
+}
