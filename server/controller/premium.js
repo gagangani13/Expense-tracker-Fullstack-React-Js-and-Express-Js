@@ -1,7 +1,7 @@
 const database = require("../database/database")
 const { Expense } = require("../model/expense")
 const { User } = require("../model/user")
-
+const AWS=require('aws-sdk')
 module.exports.getAllExpenses=async(req,res,next)=>{
     try {
         //Optimization
@@ -24,4 +24,45 @@ module.exports.getAllExpenses=async(req,res,next)=>{
         console.log(error);
     }
     
+}
+
+async function uploadToS3(data,filename) {
+    try {
+        const BUCKET_NAME='expensetrackergagan'
+        const IAM_USER_KEY=process.env.IAM_USER_KEY
+        const IAM_USER_SECRET=process.env.IAM_USER_SECRET
+        let s3bucket=new AWS.S3({
+            accessKeyId:IAM_USER_KEY,
+            secretAccessKey:IAM_USER_SECRET,
+        })
+        var params={
+            Bucket:BUCKET_NAME,
+            Body:data,
+            Key:filename,
+            ACL:'public-read'
+        }
+        return new Promise((resolve,reject)=>{
+            s3bucket.upload(params,(err,result)=>{
+                if (err) {
+                    reject(err)
+                } else {
+                    resolve(result.Location)   
+                }
+            })
+        });
+    } catch (error) {
+        res.send({message:error,ok:false})
+    }
+}
+
+module.exports.downloadAWS=async(req,res,next)=>{
+    try {
+        const getExpenses=await Expense.findAll({where:{UserId:req.userId}})
+        const stringifyExpense=JSON.stringify(getExpenses)
+        const filename=`Expenses/${req.userId}/${new Date()}.txt`
+        const fileUrl=await uploadToS3(stringifyExpense,filename)
+        res.status(200).send({ok:true,fileUrl})
+    } catch (error) {
+        res.send({message:error,ok:false})
+    }
 }

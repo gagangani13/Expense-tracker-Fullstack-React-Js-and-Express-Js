@@ -54,11 +54,9 @@ const WELCOME = () => {
   const login = useSelector((state) => state.authenticate.login);
   const light = useSelector((state) => state.theme.light);
   const activatePremium = useSelector((state) => state.authenticate.activatePremium);
-  const expenses = useSelector((state) => state.expenseList.expenses);
   const idToken = useSelector((state) => state.authenticate.idToken);
   const dispatch = useDispatch();
   const [leaderboard,setLeaderboard]=useState(false)
-  let Url;
 
   function logoutHandler() {
     dispatch(authAction.logoutHandler());
@@ -100,6 +98,7 @@ const WELCOME = () => {
             try {
               alert(response2.data.message);
               dispatch(authAction.setActivatePremium(true));
+              localStorage.setItem('premium',true)
             } catch (error) {
               console.log(error);
             }
@@ -117,19 +116,26 @@ const WELCOME = () => {
       dispatch(expenseAction.setActivatePremium(false));
     }
   }
-  function downloadExpenses() {
-    const makeCsv = expenses.map((item) => {
-      return `${item.amount},${item.description},${item.category}`;
-    });
-    makeCsv.unshift(["Amount", "Description", "Category"].join(","));
-    const blob1 = new Blob([makeCsv]);
-    Url = URL.createObjectURL(blob1);
-  }
-  activatePremium && downloadExpenses();
-  // activatePremium&&activation()
+
   function showLeaderboard() {
     setLeaderboard(!leaderboard)
   }
+
+  async function downloadExpenses(e) {
+    const response=await axios.get('http://localhost:5000/downloadAWS',{headers:{'Authorization':idToken}})
+    const data=await response.data
+    try {
+      if(data.ok){
+        const a=document.createElement('a')
+        a.href=data.fileUrl
+        a.download='Myexpense.csv'
+        a.click()
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <>
       <div className="background"></div>
@@ -169,11 +175,10 @@ const WELCOME = () => {
                 )}
 
                 {activatePremium&&<NavLink onClick={showLeaderboard}>{leaderboard?'Add expenses':'Leaderboard'}</NavLink>}
-
                 {activatePremium && (
-                  <a href={Url} download="Expenses.csv">
+                  <Button type='button' onClick={downloadExpenses}>
                     <i class="fa-solid fa-download fa-lg"></i>
-                  </a>
+                  </Button>
                 )}
 
                 <Button variant="danger" onClick={logoutHandler}>

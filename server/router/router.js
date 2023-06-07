@@ -21,6 +21,7 @@ router.delete('/deleteExpense/:Id',user.tokenDecrypt,expense.deleteExpense)
 router.get('/purchasePremium',user.tokenDecrypt,purchase.PurchasePremium)
 router.post('/updateTransactionStatus',user.tokenDecrypt,purchase.updateTransactionStatus)
 //Premium features
-router.get('/allExpenses',user.tokenDecrypt,premium.getAllExpenses)
+router.get('/allExpenses',user.tokenDecrypt,premium.getAllExpenses) //Leaderboard
+router.get('/downloadAWS',user.tokenDecrypt,premium.downloadAWS)
 
 module.exports=router
