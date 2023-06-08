@@ -78,7 +78,3 @@ module.exports.deleteExpense=async(req,res,next)=>{
         res.status(500).send({ok:false,message:'failed'})
     }
 }
-
-module.exports.pagination=async(req,res,next)=>{
-
-}

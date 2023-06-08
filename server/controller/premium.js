@@ -28,7 +28,7 @@ module.exports.getAllExpenses=async(req,res,next)=>{
 
 async function uploadToS3(data,filename) {
     try {
-        const BUCKET_NAME='expensetrackergagan'
+        const BUCKET_NAME=process.env.AWS_S3_NAME
         const IAM_USER_KEY=process.env.IAM_USER_KEY
         const IAM_USER_SECRET=process.env.IAM_USER_SECRET
         let s3bucket=new AWS.S3({

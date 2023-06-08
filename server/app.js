@@ -8,7 +8,9 @@ const { User } = require('./model/user')
 const { Expense } = require('./model/expense')
 const { Order } = require('./model/order')
 const { ForgotPassword } = require('./model/forgotPassword')
-
+require('dotenv').config()
+const helmet=require('helmet')
+const compression=require('compression')
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
@@ -23,4 +25,6 @@ User.hasMany(ForgotPassword)
 ForgotPassword.belongsTo(User)
 
 app.use(router)
-database.sync().then(res=>app.listen(5000)).catch(err=>console.log(err))
+app.use(helmet())
+app.use(compression())
+database.sync().then(res=>app.listen(process.env.PORT)).catch(err=>console.log(err))

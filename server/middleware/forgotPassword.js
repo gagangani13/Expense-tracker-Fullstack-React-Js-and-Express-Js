@@ -1,6 +1,6 @@
 const { ForgotPassword } = require("../model/forgotPassword")
 const { User } = require("../model/user")
-
+require('dotenv').config()
 module.exports.forgotPassword=async(req,res,next)=>{
     try {
         const {email}=req.body
