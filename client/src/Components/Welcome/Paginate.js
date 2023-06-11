@@ -33,7 +33,7 @@ const Paginate = (props) => {
         </Button>
       )}
       <Button id='currentPage' variant="dark" >{props.data.currentPage}</Button>
-      {props.data.currentPage !== props.data.lastPage && (
+      {props.data.nextPage <= props.data.lastPage && props.data.lastPage!==0&&(
         <Button type="button" variant="light" onClick={nextPage}>
           <i class="fa-solid fa-chevron-right"></i>
         </Button>

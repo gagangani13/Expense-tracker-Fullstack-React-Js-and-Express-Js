@@ -17,11 +17,13 @@ router.post('/updatePassword/:Id',login.updatePassword)
 router.post('/addExpense',user.tokenDecrypt,expense.addExpense)
 router.get('/getExpenses',user.tokenDecrypt,expense.getExpenses)
 router.delete('/deleteExpense/:Id',user.tokenDecrypt,expense.deleteExpense)
+router.put('/editExpense/:Id',expense.editExpense)
+router.get('/getExpense/:Id',expense.getExpense)
 //Razorpay
 router.get('/purchasePremium',user.tokenDecrypt,purchase.PurchasePremium)
 router.post('/updateTransactionStatus',user.tokenDecrypt,purchase.updateTransactionStatus)
 //Premium features
 router.get('/allExpenses',user.tokenDecrypt,premium.getAllExpenses) //Leaderboard
 router.get('/downloadAWS',user.tokenDecrypt,premium.downloadAWS)
-
+router.get('/viewDownloads',user.tokenDecrypt,premium.viewDownloads)
 module.exports=router

@@ -1,47 +1,51 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Card, Form, Button } from "react-bootstrap";
+import { Form, Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { expenseAction } from "../Store/expenseSlice";
 import "./expenseForm.css";
 import axios from "axios";
 import Paginate from "./Paginate";
+import { motion } from "framer-motion";
+import Loader from "./Loader";
+import DateFormat from "./DateFormat";
 
-var pageData={}
-var pageSize=localStorage.getItem('size')||2
-var currPage=localStorage.getItem('currentPage')||1
+var pageData = {};
+var pageSize = localStorage.getItem("size") || 2;
+var currPage = localStorage.getItem("currentPage") || 1;
 const ExpenseForm = () => {
   const dispatch = useDispatch();
   const expenses = useSelector((state) => state.expenseList.expenses);
   const editing = useSelector((state) => state.expenseList.editing);
   const userId = useSelector((state) => state.authenticate.userId);
   const token = useSelector((state) => state.authenticate.idToken);
-  const light = useSelector((state) => state.theme.light);
   const [load, setLoad] = useState(false);
   const amountRef = useRef();
   const descriptionRef = useRef();
   const categoryRef = useRef();
-  const dateRef=useRef();
-  useEffect(()=>{
-    console.log(currPage,pageSize);
-    document.getElementById('pageSize').value=pageSize
-    getExpenses(currPage,pageSize)
+  const dateRef = useRef();
+  useEffect(() => {
+    console.log(currPage, pageSize);
+    document.getElementById("pageSize").value = pageSize;
+    getExpenses(currPage, pageSize);
     // eslint-disable-next-line
-  },[])
+  }, []);
 
-  async function getExpenses(currPage=1,size=2) {
+  async function getExpenses(currPage = 1, size = 2) {
     const token = localStorage.getItem("idToken");
-    const response = await axios.get(`http://localhost:5000/getExpenses?page=${currPage}&size=${size}`, {
-      headers: { Authorization: token },
-    });
+    const response = await axios.get(
+      `http://localhost:5000/getExpenses?page=${currPage}&size=${size}`,
+      {
+        headers: { Authorization: token },
+      }
+    );
     const data = await response.data;
     try {
-      console.log(data);
       if (data.ok) {
-        localStorage.setItem('currentPage',currPage)
-        localStorage.setItem('size',size)
-        pageData=data
-        pageSize=size
-        currPage=data.currentPage
+        localStorage.setItem("currentPage", currPage);
+        localStorage.setItem("size", size);
+        pageData = data;
+        pageSize = size;
+        currPage = data.currentPage;
         let arr = [];
         const expense = data.expenses;
         for (const item in expense) {
@@ -50,6 +54,7 @@ const ExpenseForm = () => {
             description: expense[item].description,
             category: expense[item].category,
             expenseId: expense[item].id,
+            date: expense[item].date,
           });
         }
         dispatch(expenseAction.reloadExpense(arr));
@@ -67,25 +72,22 @@ const ExpenseForm = () => {
       amount: amountRef.current.value,
       description: descriptionRef.current.value,
       category: categoryRef.current.value,
-      date:dateRef.current.value
+      date: dateRef.current.value,
     };
     if (editing === null) {
       const response = await axios.post(
         "http://localhost:5000/addExpense",
         details,
         { headers: { Authorization: token } }
-        );
-        const data = await response.data;
-        try {
-          setLoad(false);
-          if (data.ok) {
+      );
+      const data = await response.data;
+      try {
+        setLoad(false);
+        if (data.ok) {
           details = { ...details, expenseId: data.id };
-          amountRef.current.value = "";
-          descriptionRef.current.value = "";
-          categoryRef.current.value = "";
-          dateRef.current.value="";
+          emptyForm();
           dispatch(expenseAction.loadExpenses(details));
-          getExpenses(1,pageSize)
+          getExpenses(1, pageSize);
         } else {
           throw new Error();
         }
@@ -93,33 +95,36 @@ const ExpenseForm = () => {
         alert(data.error.message);
       }
     } else {
-      const response = await fetch(
-        `https://signup-and-authenticatio-f712f-default-rtdb.firebaseio.com/Users/${userId}/${editing}.json`,
-        {
-          method: "PUT",
-          body: JSON.stringify(details),
-        }
+      const response = await axios.put(
+        `http://localhost:5000/editExpense/${editing}`,
+        details
       );
-      const data = await response.json();
+      const data = await response.data;
       try {
         setLoad(false);
-        if (response.ok) {
-          amountRef.current.value = "";
-          descriptionRef.current.value = "";
-          categoryRef.current.value = "";
-          dateRef.current.value="";
-          const editArray = expenses.filter((item) => {
-            return item.expenseId !== editing;
+        if (data.ok) {
+          const editArray = expenses.map((item) => {
+            console.log(item.expenseId, editing);
+            if (item.expenseId === Number(editing)) {
+              return {
+                expenseId: editing,
+                amount: amountRef.current.value,
+                description: descriptionRef.current.value,
+                category: categoryRef.current.value,
+                date: dateRef.current.value,
+              };
+            }
+            return item;
           });
-          editArray.unshift({ ...details, expenseId: editing });
           dispatch(expenseAction.reloadExpense(editArray));
           dispatch(expenseAction.editExpense(null));
         } else {
           throw new Error();
         }
       } catch (error) {
-        alert(data.error.message);
+        alert(data.message);
       }
+      emptyForm();
     }
   }
   async function deleteExpense(e) {
@@ -135,12 +140,7 @@ const ExpenseForm = () => {
       console.log(data);
       setLoad(false);
       if (data.ok) {
-        const deleteArray = expenses.filter((item) => {
-          console.log(item.expenseId, key);
-          return item.expenseId !== key;
-        });
-        console.log(deleteArray);
-        dispatch(expenseAction.reloadExpense(deleteArray));
+        getExpenses(currPage,pageSize)
       } else {
         throw new Error();
       }
@@ -151,27 +151,40 @@ const ExpenseForm = () => {
   async function editExpense(e) {
     setLoad(true);
     const key = e.target.parentElement.id;
-    const response = await fetch(
-      `https://signup-and-authenticatio-f712f-default-rtdb.firebaseio.com/Users/${userId}/${key}.json`
-    );
-    const data = await response.json();
+    const response = await axios.get(`http://localhost:5000/getExpense/${key}`);
+    const data = await response.data;
     try {
       setLoad(false);
-      if (response.ok) {
-        amountRef.current.value = data.amount;
-        descriptionRef.current.value = data.description;
-        categoryRef.current.value = data.category;
+      if (data.ok) {
+        amountRef.current.value = data.expense.amount;
+        descriptionRef.current.value = data.expense.description;
+        categoryRef.current.value = data.expense.category;
+        dateRef.current.value = data.expense.date;
         dispatch(expenseAction.editExpense(key));
       } else {
         throw new Error();
       }
     } catch (error) {
-      alert(data.error.message);
+      alert(data.message);
     }
   }
+  function emptyForm() {
+    amountRef.current.value = "";
+    descriptionRef.current.value = "";
+    categoryRef.current.value = "";
+    dateRef.current.value = "";
+  }
+  function cancelUpdate() {
+    emptyForm();
+    dispatch(expenseAction.editExpense(null));
+  }
   return (
-    <div className="welcomeLayout">
-      {console.log('run')}
+    <motion.div
+      className="welcomeLayout"
+      initial={{ opacity: 0, x: "-100vw" }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ type: "spring", stiffness: 100 }}
+    >
       <h3>ADD EXPENSES</h3>
       <Form className="form" onSubmit={addExpenses}>
         <Form.Control
@@ -188,7 +201,13 @@ const ExpenseForm = () => {
           required
         />
 
-        <Form.Control type="date" name="dob" placeholder="Date of Expense" ref={dateRef} required/>
+        <Form.Control
+          type="date"
+          name="dob"
+          placeholder="Date of Expense"
+          ref={dateRef}
+          required
+        />
 
         <Form.Select defaultValue="Me" ref={categoryRef} required>
           <option>Me</option>
@@ -197,48 +216,61 @@ const ExpenseForm = () => {
         </Form.Select>
 
         <Button variant="dark" type="submit">
-          ADD
+          {editing === null ? "ADD" : "UPDATE"}
         </Button>
+        {editing !== null && (
+          <Button variant="danger" type="button" onClick={cancelUpdate}>
+            CANCEL
+          </Button>
+        )}
       </Form>
       <>
-        {load && <h5>Loading...</h5>}
-        {expenses.map((item) => {
-          return (
-            <Card className="mb-2">
-              <Card.Body
+        {load && <Loader />}
+        {editing === null &&
+          expenses.map((item) => {
+            console.log(item);
+            return (
+              <motion.li
                 id={item.expenseId}
-                className="d-flex justify-content-around align-items-baseline"
-                style={{
-                  backgroundColor: light ? "#bdcfc7" : "rgb(88 94 92)",
-                  fontSize: "larger",
-                  fontWeight: "bold",
-                  color: light ? "black" : "white",
-                }}
+                className="expenseItem"
+                initial={{ scale: 1 }}
+                whileHover={{ x: 0, scale: 1.1 }}
+                transition={{ type: "just", stiffness: 20 }}
               >
-                <Card.Text>Rs.{item.amount} </Card.Text>
-                <Card.Text>{item.description} </Card.Text>
-                <Card.Text>{item.category}</Card.Text>
-                <button
-                  onClick={editExpense}
-                  class="fa-solid fa-pen"
-                  style={{ padding: "5px", borderRadius: "1rem" }}
-                ></button>
+                <DateFormat date={new Date(item.date)} />
+                <span>Rs.{item.amount} </span>
+                <span>{item.description} </span>
+                <span>{item.category}</span>
+
+                <button onClick={editExpense} class="fa-solid fa-pen button"></button>
                 <button
                   onClick={deleteExpense}
-                  class="fa-solid fa-trash-can"
-                  style={{
-                    color: "#d90d0d",
-                    padding: "5px",
-                    borderRadius: "1rem",
-                  }}
+                  class="fa-solid fa-trash-can button"
+                  style={{ color: "red" }}
                 ></button>
-              </Card.Body>
-            </Card>
-          );
-        })}
+              </motion.li>
+            );
+          })}
+        {expenses.length === 0 && (
+          <motion.h3
+            initial={{ scale: 1 }}
+            animate={{ scale: 1.1 }}
+            transition={{
+              repeat: Infinity,
+              repeatType: "reverse",
+              duration: 2,
+            }}
+          >
+            No expenses to show
+          </motion.h3>
+        )}
       </>
-      <Paginate data={pageData} onChangePage={getExpenses} onChangeSize={getExpenses}/>
-    </div>
+      <Paginate
+        data={pageData}
+        onChangePage={getExpenses}
+        onChangeSize={getExpenses}
+      />
+    </motion.div>
   );
 };
 

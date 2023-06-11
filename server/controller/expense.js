@@ -3,9 +3,9 @@ const { Expense } = require("../model/expense")
 const { User } = require("../model/user");
 
 module.exports.addExpense=async(req,res,next)=>{
-    const t=await database.transaction();
-    const{amount,description,category}=req.body
-    if(!amount||!description||!category){
+    const t=await database.transaction()
+    const{amount,description,category,date}=req.body
+    if(!amount||!description||!category||!date){
         return res.status(400).send({message:'Invalid input'})
     }
     try {
@@ -13,6 +13,7 @@ module.exports.addExpense=async(req,res,next)=>{
             amount:amount,
             description:description,
             category:category,
+            date:date,
             UserId:req.userId
         },{transaction:t})
         const getUser=await User.findByPk(req.userId)
@@ -26,7 +27,7 @@ module.exports.addExpense=async(req,res,next)=>{
         }
     } catch (error) {
         await t.rollback()
-        res.status(400).send({message:'Expense not added',ok:false})
+        res.status(200).send({message:'Expense not added',ok:false})
     }
 }
 
@@ -43,15 +44,15 @@ module.exports.getExpenses=async(req,res,next)=>{
             const expenses=await Expense.findAll({where:{UserId:req.userId},
                 offset:offset,
                 limit:itemsPerPage,
-                order:[['createdAt','DESC']]
+                order:[['date','DESC']]
             })
             res.send({
                 ok:true,
                 currentPage:page,
                 previousPage:page-1,
-                nextPage:page+1,
+                nextPage:(expenses.length<itemsPerPage)?0:page+1,
                 expenses:expenses,
-                lastPage:Math.ceil(count/itemsPerPage)
+                lastPage:expenses.length<itemsPerPage?0:Math.ceil(count/itemsPerPage)
             })
         }
     } catch (error) {
@@ -76,5 +77,46 @@ module.exports.deleteExpense=async(req,res,next)=>{
     } catch (error) {
         await t.rollback()
         res.status(500).send({ok:false,message:'failed'})
+    }
+}
+
+module.exports.editExpense=async(req,res,next)=>{
+    const t=await database.transaction()
+    try {
+        const Id=req.params.Id
+        const{amount,description,date,category}=req.body
+        if(!amount||!description||!date||!category){
+            throw new Error('Invalid input')
+        }
+        const getExpense=await Expense.findByPk(Id)
+        const getUser=await User.findByPk(getExpense.UserId)  
+        const oldExpense=Number(getUser.totalExpense)-Number(getExpense.amount)     
+        const updateExpense=await getExpense.update({
+            amount:amount,
+            date:date,
+            category:category,
+            description:description
+        },{transaction:t})
+        const updateUser=await getUser.update({totalExpense:oldExpense+Number(amount)},{transaction:t})
+        try {
+            await t.commit()
+            res.send({message:'Expenses updated',expense:updateExpense,ok:true})
+        } catch (error) {
+            throw new Error()
+        }
+    } catch (error) {
+        await t.rollback()
+        res.status(200).send({message:error.message,ok:false})
+    }
+}
+
+module.exports.getExpense=async(req,res,next)=>{
+    try {
+        const Id=Number(req.params.Id)
+        const getExpense=await Expense.findOne({where:{id:Id}})
+        console.log(getExpense);
+        res.send({message:'Edit expense',expense:getExpense,ok:true})    
+    } catch (error) {
+        res.send({message:'Error',ok:false})
     }
 }

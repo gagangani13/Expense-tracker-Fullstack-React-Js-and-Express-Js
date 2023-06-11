@@ -1,4 +1,4 @@
-const { INTEGER, STRING } = require('sequelize');
+const { INTEGER, STRING, DATE } = require('sequelize');
 const database=require('../database/database');
 const Expense=database.define('Expense',{
     id:{
@@ -15,6 +15,10 @@ const Expense=database.define('Expense',{
         type:STRING
     },
     category:{
+        allowNull:false,
+        type:STRING
+    },
+    date:{
         allowNull:false,
         type:STRING
     }

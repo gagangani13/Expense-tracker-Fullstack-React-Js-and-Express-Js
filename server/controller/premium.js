@@ -1,7 +1,10 @@
 const database = require("../database/database")
+const { Download } = require("../model/download")
 const { Expense } = require("../model/expense")
 const { User } = require("../model/user")
 const AWS=require('aws-sdk')
+
+//Leaderboard
 module.exports.getAllExpenses=async(req,res,next)=>{
     try {
         //Optimization
@@ -61,8 +64,22 @@ module.exports.downloadAWS=async(req,res,next)=>{
         const stringifyExpense=JSON.stringify(getExpenses)
         const filename=`Expenses/${req.userId}/${new Date()}.txt`
         const fileUrl=await uploadToS3(stringifyExpense,filename)
+        const downloadTable=await Download.create({
+            downloadLink:fileUrl,
+            UserId:req.userId,
+            date:new Date()
+        })
         res.status(200).send({ok:true,fileUrl})
     } catch (error) {
         res.send({message:error,ok:false})
+    }
+}
+
+module.exports.viewDownloads=async(req,res,next)=>{
+    try {
+        const downloads=await Download.findAll({where:{UserId:req.userId},order:[['date','DESC']]})
+        res.send({ok:true,downloads:downloads})
+    } catch (error) {
+        res.send({ok:false,message:'Error'})
     }
 }

@@ -5,6 +5,8 @@ import { Route, Redirect } from "react-router-dom";
 import { authAction } from "../Store/authSlice";
 import axios from "axios";
 import "./login.css";
+import { motion } from "framer-motion";
+
 const LOGIN = () => {
   const dispatch = useDispatch();
   const loginState = useSelector((state) => state.authenticate.login);
@@ -93,7 +95,7 @@ const LOGIN = () => {
     <>
       <div id="webpage"></div>
       <div>
-        <h1 id="loginH1">Expense Tracker</h1>
+        <motion.h1 initial={{opacity:0}} animate={{opacity:1,}} transition={{repeat:Infinity,repeatType:"reverse",duration:3,type:'spring'}} id="loginH1">Expense Tracker</motion.h1>
         <div className="layout">
           <h2 className="my-4">
             {!newPassword && (login ? "LOGIN" : "SIGN UP")}

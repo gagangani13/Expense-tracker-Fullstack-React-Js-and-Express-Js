@@ -1,18 +1,29 @@
 import React, { useEffect, useState } from "react";
-import { Navbar, Container, Button, NavLink } from "react-bootstrap";
+import { Dropdown, Navbar, NavLink } from "react-bootstrap";
 import { Route, Redirect } from "react-router-dom";
 import ExpenseForm from "./ExpenseForm";
 import { useSelector, useDispatch } from "react-redux";
 import { authAction } from "../Store/authSlice";
 import { expenseAction } from "../Store/expenseSlice";
-import "./toggleSwitch.css";
 import "./welcome.css";
-import { themeAction } from "../Store/themeSlice";
 import axios from "axios";
 import Leaderboard from "./Leaderboard";
+import { AnimatePresence, motion } from "framer-motion";
 import Downloads from "./Downloads";
-import ToggleSwitch from "./ToggleSwitch";
 
+//Animation
+const navbarVariant = {
+  whileHover: {
+    scale: 1.1,
+    x: 0,
+    fontWeight: "bold",
+    transition: {
+      yoyo: Infinity, //yoyo is a repeating key, you can set to repeat n no of times ex-5 or infinte
+    },
+  },
+};
+
+//
 const WELCOME = () => {
   useEffect(() => {
     const idToken = localStorage.getItem("idToken");
@@ -22,35 +33,34 @@ const WELCOME = () => {
       dispatch(authAction.loginHandler());
       dispatch(authAction.setToken(idToken));
       dispatch(authAction.setUserId(userId));
-      activatePremium!=='null' && dispatch(authAction.setActivatePremium(true));
+      activatePremium !== "null" &&
+        dispatch(authAction.setActivatePremium(true));
     }
     // eslint-disable-next-line
   }, []);
-    
+
   const login = useSelector((state) => state.authenticate.login);
-  const light = useSelector((state) => state.theme.light);
-  const activatePremium = useSelector((state) => state.authenticate.activatePremium);
+  const activatePremium = useSelector(
+    (state) => state.authenticate.activatePremium
+  );
   const idToken = useSelector((state) => state.authenticate.idToken);
   const dispatch = useDispatch();
-  const [leaderboard,setLeaderboard]=useState(false)
-  const[viewDownloads,setViewDownloads]=useState(false)
-  const [addExpense,setAddExpense]=useState(true)
+  const [leaderboard, setLeaderboard] = useState(false);
+  const [viewDownloads, setViewDownloads] = useState(false);
+  const [addExpense, setAddExpense] = useState(true);
+  const [menu, setMenu] = useState(false);
 
   function logoutHandler() {
     dispatch(authAction.logoutHandler());
     localStorage.removeItem("idToken");
     localStorage.removeItem("userId");
     localStorage.removeItem("premium");
-    !light && dispatch(themeAction.setLight());
-    // activatePremium && dispatch(expenseAction.setActivatePremium(false));
-  }
-  function setTheme() {
-    dispatch(themeAction.setLight());
+    localStorage.removeItem("size");
+    localStorage.removeItem("currentPage");
   }
   async function activation(e) {
-    if (activatePremium && !light) {
-      dispatch(themeAction.setLight());
-    }
+    setMenu(false)
+    e.preventDefault();
     if (!activatePremium) {
       const response = await axios.get(
         "http://localhost:5000/purchasePremium",
@@ -75,7 +85,7 @@ const WELCOME = () => {
             try {
               alert(response2.data.message);
               dispatch(authAction.setActivatePremium(true));
-              localStorage.setItem('premium',true)
+              localStorage.setItem("premium", true);
             } catch (error) {
               console.log(error);
             }
@@ -84,44 +94,50 @@ const WELCOME = () => {
       } catch (error) {
         console.log(error);
       }
-
       const rzp = new window.Razorpay(options);
       rzp.open();
-      e.preventDefault();
     } else if (activatePremium) {
       localStorage.setItem("activatePremium", false);
       dispatch(expenseAction.setActivatePremium(false));
     }
   }
   function showLeaderboard() {
-    setLeaderboard(!leaderboard)
-    viewDownloads&&setViewDownloads(false)
-    addExpense&&setAddExpense(false)
+    setMenu(false)
+    setLeaderboard(true);
+    viewDownloads && setViewDownloads(false);
+    addExpense && setAddExpense(false);
   }
-  function setDownloads(){
-    setViewDownloads(!viewDownloads)
-    leaderboard&&setLeaderboard(false)
-    addExpense&&setAddExpense(false)
+  function setDownloads() {
+    setMenu(false)
+    setViewDownloads(true);
+    leaderboard && setLeaderboard(false);
+    addExpense && setAddExpense(false);
   }
   function showExpense() {
-    setAddExpense(!addExpense)
-    leaderboard&&setLeaderboard(false)
-    viewDownloads&&setViewDownloads(false)
+    setMenu(false)
+    setAddExpense(true);
+    leaderboard && setLeaderboard(false);
+    viewDownloads && setViewDownloads(false);
   }
-  // !viewDownloads&&!leaderboard&&!addExpense&&setAddExpense(true)
   async function downloadExpenses(e) {
-    const response=await axios.get('http://localhost:5000/downloadAWS',{headers:{'Authorization':idToken}})
-    const data=await response.data
+    setMenu(false)
+    const response = await axios.get("http://localhost:5000/downloadAWS", {
+      headers: { Authorization: idToken },
+    });
+    const data = await response.data;
     try {
-      if(data.ok){
-        const a=document.createElement('a')
-        a.href=data.fileUrl
-        a.download='Myexpense.csv'
-        a.click()
+      if (data.ok) {
+        const a = document.createElement("a");
+        a.href = data.fileUrl;
+        a.download = "Myexpense.csv";
+        a.click();
       }
     } catch (error) {
       console.log(error);
     }
+  }
+  function showMenu() {
+    setMenu(!menu);
   }
 
   return (
@@ -130,39 +146,84 @@ const WELCOME = () => {
       <>
         {login && (
           <>
-            <Navbar
-              expand="sm"
-              variant="dark"
-              className="position-fixed w-100 text-l"
-              id="Navbar"
-            >
-              <Container>
-                <h1 id="welcomeH1">Expense Tracker</h1>
-
-                {activatePremium && <ToggleSwitch setTheme={setTheme}/>}
-
-                {!activatePremium && (
-                  <Button variant="success" type="button" onClick={activation}>
-                    Activate Premium
-                  </Button>
+            <div className="header">
+              <Navbar id="Navbar">
+                <h1 className="welcomeH1">Expense Tracker</h1>
+                <AnimatePresence>
+                  {menu && (
+                    <motion.div
+                    className="NavLinks"
+                    initial={{ y: "-100vw" }}
+                    animate={{ y: "0vw" }}
+                    transition={{ type: "tween", stiffness: 100 }}
+                    exit={{y:'-100vw'}}
+                    >
+                      {activatePremium && (
+                        <motion.span
+                        variants={navbarVariant}
+                        whileHover="whileHover"
+                        >
+                          {<NavLink onClick={showExpense}>ADD EXPENSE</NavLink>}
+                        </motion.span>
+                      )}
+                      {!activatePremium && (
+                        <motion.div variants={navbarVariant} whileHover="whileHover">
+                          <NavLink onClick={activation}>Activate Premium</NavLink>
+                        </motion.div>
+                      )}
+                      {activatePremium && (
+                        <motion.span
+                          variants={navbarVariant}
+                          whileHover="whileHover"
+                        >
+                          <NavLink onClick={showLeaderboard}>
+                            LEADERBOARD
+                          </NavLink>
+                        </motion.span>
+                      )}
+                      {activatePremium && (
+                        <motion.span
+                          variants={navbarVariant}
+                          whileHover="whileHover"
+                        >
+                          <Dropdown>
+                            <Dropdown.Toggle variant="success">
+                              DOWNLOAD
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                              <Dropdown.Item onClick={setDownloads}>
+                                View Downloads
+                              </Dropdown.Item>
+                              <Dropdown.Item onClick={downloadExpenses}>
+                                Download
+                              </Dropdown.Item>
+                            </Dropdown.Menu>
+                          </Dropdown>
+                        </motion.span>
+                      )}
+                      <motion.span
+                        variants={navbarVariant}
+                        whileHover="whileHover"
+                      >
+                        <NavLink onClick={logoutHandler}>LOGOUT</NavLink>
+                      </motion.span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </Navbar>
+              <button className="menuBar" onClick={showMenu}>
+                {!menu ? (
+                  <i class="fa-solid fa-bars fa-lg " />
+                ) : (
+                  <i class="fa-solid fa-xmark fa-lg" />
                 )}
-                {activatePremium&&<NavLink className='activeLink' onClick={showExpense}>ADD EXPENSE</NavLink>}
-                {activatePremium&&<NavLink className='activeLink' onClick={showLeaderboard}>LEADERBOARD</NavLink>}
-                {activatePremium&&<NavLink className='activeLink' onClick={setDownloads}>VIEW DOWNLOADS</NavLink>}
-                {activatePremium && (
-                  <Button type='button' onClick={downloadExpenses}>
-                    <i class="fa-solid fa-download fa-lg"></i>
-                  </Button>
-                )}
-
-                <Button variant="danger" onClick={logoutHandler}>
-                  LOGOUT
-                </Button>
-              </Container>
-            </Navbar>
-            {addExpense&&<ExpenseForm />}
-            {leaderboard&&<Leaderboard/>}
-            {viewDownloads&&<Downloads/>}
+              </button>
+            </div>
+            <>
+              {!menu&&addExpense && <ExpenseForm />}
+              {!menu&&leaderboard && <Leaderboard />}
+              {!menu&&viewDownloads && <Downloads />}
+            </>
           </>
         )}
         {!login && (
@@ -171,7 +232,6 @@ const WELCOME = () => {
           </Route>
         )}
       </>
-  
     </>
   );
 };

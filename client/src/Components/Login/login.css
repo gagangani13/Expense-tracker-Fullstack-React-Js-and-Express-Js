@@ -21,9 +21,9 @@
   text-align: center;
   padding: 2rem;
   position: absolute;
-  width: 100vw;
+  width: 100%;
   color: beige;
-  background: linear-gradient(45deg, black, transparent);
+  /* background: linear-gradient(45deg, black, transparent); */
 }
 
 h2 {

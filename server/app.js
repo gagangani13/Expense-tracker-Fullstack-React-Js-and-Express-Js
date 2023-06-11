@@ -11,6 +11,7 @@ const { ForgotPassword } = require('./model/forgotPassword')
 require('dotenv').config()
 const helmet=require('helmet')
 const compression=require('compression')
+const { Download } = require('./model/download')
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
@@ -23,6 +24,9 @@ Order.belongsTo(User)
 
 User.hasMany(ForgotPassword)
 ForgotPassword.belongsTo(User)
+
+User.hasMany(Download)
+Download.belongsTo(User)
 
 app.use(router)
 app.use(helmet())
