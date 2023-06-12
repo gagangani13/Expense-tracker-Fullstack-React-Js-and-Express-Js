@@ -60,10 +60,11 @@ const WELCOME = () => {
   }
   async function activation(e) {
     setMenu(false)
+    setAddExpense(false);
     e.preventDefault();
     if (!activatePremium) {
       const response = await axios.get(
-        "http://localhost:5000/purchasePremium",
+        "http://44.204.178.196:5000/purchasePremium",
         { headers: { Authorization: idToken } }
       );
       const data = await response.data;
@@ -75,7 +76,7 @@ const WELCOME = () => {
           amount: data.order.amount,
           handler: async (response) => {
             const response2 = await axios.post(
-              "http://localhost:5000/updateTransactionStatus",
+              "http://44.204.178.196:5000/updateTransactionStatus",
               {
                 orderId: options.orderId,
                 paymentId: response.razorpay_payment_id,
@@ -121,7 +122,7 @@ const WELCOME = () => {
   }
   async function downloadExpenses(e) {
     setMenu(false)
-    const response = await axios.get("http://localhost:5000/downloadAWS", {
+    const response = await axios.get("http://44.204.178.196:5000/downloadAWS", {
       headers: { Authorization: idToken },
     });
     const data = await response.data;

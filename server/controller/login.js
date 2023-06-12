@@ -106,16 +106,20 @@ module.exports.updatePassword = async (req, res, next) => {
             if(err){
                 return res.send(err)
             }else if(result){
+              try {
                 const findPassword=await ForgotPassword.findOne({where:{id:UUID}},{transaction:t})
+                if (findPassword===null) {
+                  return res.send({message:'Password change failed',ok:false})
+                }
                 const findUser=await User.findOne({where:{id:findPassword.UserId}},{transaction:t})
                 const updatePassword=await findPassword.update({isActive:false},{transaction:t})
                 const updateUser=await findUser.update({password:result},{transaction:t})
-                try {
-                    t.commit()
-                    res.send({message:'Password changed successfully',ok:true})
-                } catch (error) {
-                    throw new Error()
-                }
+                t.commit();
+                res.send({message:'Password changed successfully',ok:true})
+              } catch (error) {
+                t.rollback();
+                res.send({message:'Password change failed',ok:false})
+              }
             }
         })
     } catch (error) {

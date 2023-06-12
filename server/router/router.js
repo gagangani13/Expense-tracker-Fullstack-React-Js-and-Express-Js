@@ -26,4 +26,5 @@ router.post('/updateTransactionStatus',user.tokenDecrypt,purchase.updateTransact
 router.get('/allExpenses',user.tokenDecrypt,premium.getAllExpenses) //Leaderboard
 router.get('/downloadAWS',user.tokenDecrypt,premium.downloadAWS)
 router.get('/viewDownloads',user.tokenDecrypt,premium.viewDownloads)
+
 module.exports=router
