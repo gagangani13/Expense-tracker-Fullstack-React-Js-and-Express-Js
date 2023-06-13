@@ -8,12 +8,14 @@ const ChangePassword = () => {
     const params=useParams()
     async function addData(e){
         e.preventDefault();
-        const response=await axios.post(`http://44.204.178.196:5000/updatePassword/${params.Id}`,{password:passwordRef.current.value})
+        const response=await axios.post(`http://localhost:5000/updatePassword/${params.Id}`,{password:passwordRef.current.value})
         const data=await response.data
         try {
             if (data.ok) {
                 setOpenET(true)  
                 alert(data.message) 
+            }else{
+              throw new Error()
             }
         } catch (error) {
             alert(data.message)

@@ -33,7 +33,7 @@ const ExpenseForm = () => {
   async function getExpenses(currPage = 1, size = 2) {
     const token = localStorage.getItem("idToken");
     const response = await axios.get(
-      `http://44.204.178.196:5000/getExpenses?page=${currPage}&size=${size}`,
+      `http://localhost:5000/getExpenses?page=${currPage}&size=${size}`,
       {
         headers: { Authorization: token },
       }
@@ -76,7 +76,7 @@ const ExpenseForm = () => {
     };
     if (editing === null) {
       const response = await axios.post(
-        "http://44.204.178.196:5000/addExpense",
+        "http://localhost:5000/addExpense",
         details,
         { headers: { Authorization: token } }
       );
@@ -96,7 +96,7 @@ const ExpenseForm = () => {
       }
     } else {
       const response = await axios.put(
-        `http://44.204.178.196:5000/editExpense/${editing}`,
+        `http://localhost:5000/editExpense/${editing}`,
         details
       );
       const data = await response.data;
@@ -132,7 +132,7 @@ const ExpenseForm = () => {
     const key = Number(e.target.parentElement.id);
     console.log(userId, key);
     const response = await axios.delete(
-      `http://44.204.178.196:5000/deleteExpense/${key}`,
+      `http://localhost:5000/deleteExpense/${key}`,
       { headers: { Authorization: token } }
     );
     const data = await response.data;
@@ -151,7 +151,7 @@ const ExpenseForm = () => {
   async function editExpense(e) {
     setLoad(true);
     const key = e.target.parentElement.id;
-    const response = await axios.get(`http://44.204.178.196:5000/getExpense/${key}`);
+    const response = await axios.get(`http://localhost:5000/getExpense/${key}`);
     const data = await response.data;
     try {
       setLoad(false);
