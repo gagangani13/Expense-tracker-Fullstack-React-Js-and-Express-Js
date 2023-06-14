@@ -34,7 +34,7 @@ app.use(compression())
 
 //wrongUrl
 app.use('/',(req,res)=>{
-    res.redirect('http://localhost:3000/')
+    res.redirect('https://localhost:3000/')
 })
 
 database.sync().then(res=>app.listen(process.env.PORT)).catch(err=>console.log(err))
