@@ -2,8 +2,8 @@ const database = require("../database/database")
 const { Download } = require("../model/download")
 const { Expense } = require("../model/expense")
 const { User } = require("../model/user")
-const AWS=require('aws-sdk')
-
+const AWS=require('aws-sdk');
+require('dotenv').config();
 //Leaderboard
 module.exports.getAllExpenses=async(req,res,next)=>{
     try {
@@ -30,10 +30,10 @@ module.exports.getAllExpenses=async(req,res,next)=>{
 }
 
 async function uploadToS3(data,filename) {
+    const BUCKET_NAME=process.env.AWS_S3_NAME 
+    const IAM_USER_KEY=process.env.IAM_USER_KEY
+    const IAM_USER_SECRET=process.env.IAM_USER_SECRET
     try {
-        const BUCKET_NAME=process.env.AWS_S3_NAME
-        const IAM_USER_KEY=process.env.IAM_USER_KEY
-        const IAM_USER_SECRET=process.env.IAM_USER_SECRET
         let s3bucket=new AWS.S3({
             accessKeyId:IAM_USER_KEY,
             secretAccessKey:IAM_USER_SECRET,
@@ -69,7 +69,7 @@ module.exports.downloadAWS=async(req,res,next)=>{
             UserId:req.userId,
             date:new Date()
         })
-        res.status(200).send({ok:true,fileUrl})
+        res.status(200).send({ok:true,fileUrl,stringifyExpense})
     } catch (error) {
         res.send({message:error,ok:false})
     }
@@ -81,5 +81,18 @@ module.exports.viewDownloads=async(req,res,next)=>{
         res.send({ok:true,downloads:downloads})
     } catch (error) {
         res.send({ok:false,message:'Error'})
+    }
+}
+
+module.exports.verifyPremium=async(req,res,next)=>{
+    try {
+        const getUser=await User.findById(req.userId)
+        if (getUser.premium) {
+            res.send({ok:true})
+        }else{
+            throw new Error()
+        }
+    } catch (error) {
+        res.send({ok:false})
     }
 }
