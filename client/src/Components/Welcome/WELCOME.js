@@ -18,7 +18,10 @@ const navbarVariant = {
     x: 0,
     fontWeight: "bold",
     transition: {
-      yoyo: Infinity, //yoyo is a repeating key, you can set to repeat n no of times ex-5 or infinte
+      repeat:Infinity,
+      type:'tween',
+      duration:2,
+      repeatType:"reverse"
     },
   },
 };
@@ -28,13 +31,11 @@ const WELCOME = () => {
   useEffect(() => {
     const idToken = localStorage.getItem("idToken");
     const userId = localStorage.getItem("userId");
-    const activatePremium = localStorage.getItem("premium");
     if (idToken && userId) {
       dispatch(authAction.loginHandler());
       dispatch(authAction.setToken(idToken));
       dispatch(authAction.setUserId(userId));
-      activatePremium !== "null" &&
-        dispatch(authAction.setActivatePremium(true));
+      verifyPremium()
     }
     // eslint-disable-next-line
   }, []);
@@ -43,7 +44,7 @@ const WELCOME = () => {
   const activatePremium = useSelector(
     (state) => state.authenticate.activatePremium
   );
-  const idToken = useSelector((state) => state.authenticate.idToken);
+  const idToken = localStorage.getItem('idToken')
   const dispatch = useDispatch();
   const [leaderboard, setLeaderboard] = useState(false);
   const [viewDownloads, setViewDownloads] = useState(false);
@@ -64,7 +65,7 @@ const WELCOME = () => {
     e.preventDefault();
     if (!activatePremium) {
       const response = await axios.get(
-        "http://3.83.190.214:5000/purchasePremium",
+        "http://localhost:5000/purchasePremium",
         { headers: { Authorization: idToken } }
       );
       const data = await response.data;
@@ -76,7 +77,7 @@ const WELCOME = () => {
           amount: data.order.amount,
           handler: async (response) => {
             const response2 = await axios.post(
-              "http://3.83.190.214:5000/updateTransactionStatus",
+              "http://localhost:5000/updateTransactionStatus",
               {
                 orderId: options.orderId,
                 paymentId: response.razorpay_payment_id,
@@ -122,7 +123,7 @@ const WELCOME = () => {
   }
   async function downloadExpenses(e) {
     setMenu(false)
-    const response = await axios.get("http://3.83.190.214:5000/downloadAWS", {
+    const response = await axios.get("http://localhost:5000/downloadAWS", {
       headers: { Authorization: idToken },
     });
     const data = await response.data;
@@ -139,6 +140,20 @@ const WELCOME = () => {
   }
   function showMenu() {
     setMenu(!menu);
+  }
+  async function verifyPremium() {
+    const response=await axios.get(`http://localhost:5000/verifyPremium`,{headers:{'Authorization':idToken}})
+    const data=await response.data
+    try {
+      if(!data.ok){
+        throw new Error()
+      }
+      dispatch(authAction.setActivatePremium(true))
+      localStorage.setItem('premium',true)
+    } catch (error) {
+      dispatch(authAction.setActivatePremium(false))
+      localStorage.setItem('premium',false)
+    }
   }
 
   return (
