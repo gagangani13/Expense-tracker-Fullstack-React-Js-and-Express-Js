@@ -11,10 +11,10 @@ const { ForgotPassword } = require('./model/forgotPassword')
 require('dotenv').config()
 const { Download } = require('./model/download')
 
-const path=require('path')
-const _dirname=path.dirname("")
-const buildPath=path.join(_dirname,"../client/build")
-app.use(express.static(buildPath))
+// const path=require('path')
+// const _dirname=path.dirname("")
+// const buildPath=path.join(_dirname,"../client/build")
+// app.use(express.static(buildPath))
 
 app.use(cors());
 app.use(bodyParser.json());

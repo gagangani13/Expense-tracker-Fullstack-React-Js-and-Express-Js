@@ -36,6 +36,7 @@ const WELCOME = () => {
       dispatch(authAction.setToken(idToken));
       dispatch(authAction.setUserId(userId));
       verifyPremium()
+      
     }
     // eslint-disable-next-line
   }, []);
@@ -146,18 +147,19 @@ const WELCOME = () => {
     const data=await response.data
     try {
       if(!data.ok){
+        dispatch(authAction.setActivatePremium(false))
+        localStorage.setItem('premium',false)
         throw new Error()
       }
       dispatch(authAction.setActivatePremium(true))
       localStorage.setItem('premium',true)
     } catch (error) {
-      dispatch(authAction.setActivatePremium(false))
-      localStorage.setItem('premium',false)
+      console.log(error);
     }
   }
 
   return (
-    <>
+    <motion.div  animate={{opacity:1}} initial={{opacity:0}} transition={{type:'tween',stiffness:50}} exit={{opacity:0}}>
       <div className="background"></div>
       <>
         {login && (
@@ -174,17 +176,17 @@ const WELCOME = () => {
                     transition={{ type: "tween", stiffness: 100 }}
                     exit={{y:'-100vw'}}
                     >
-                      {activatePremium && (
+        
                         <motion.span
                         variants={navbarVariant}
                         whileHover="whileHover"
                         >
                           {<NavLink onClick={showExpense}>ADD EXPENSE</NavLink>}
                         </motion.span>
-                      )}
+    
                       {!activatePremium && (
                         <motion.div variants={navbarVariant} whileHover="whileHover">
-                          <NavLink onClick={activation}>Activate Premium</NavLink>
+                          <NavLink onClick={activation}>ACTIVATE PREMIUM</NavLink>
                         </motion.div>
                       )}
                       {activatePremium && (
@@ -239,6 +241,7 @@ const WELCOME = () => {
               {!menu&&addExpense && <ExpenseForm />}
               {!menu&&leaderboard && <Leaderboard />}
               {!menu&&viewDownloads && <Downloads />}
+              {!menu&&!addExpense&&!leaderboard&&!viewDownloads&&setAddExpense(true)}
             </>
           </>
         )}
@@ -248,7 +251,7 @@ const WELCOME = () => {
           </Route>
         )}
       </>
-    </>
+    </motion.div>
   );
 };
 
