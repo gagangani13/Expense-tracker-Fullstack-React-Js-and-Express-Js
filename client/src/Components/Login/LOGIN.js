@@ -169,12 +169,12 @@ const LOGIN = () => {
                 </NavLink>
               )}
               {!newPassword && (
-                <Button className="mb-3" variant="primary" type="submit">
+                <Button className="mb-3"  id='loginBtn' type="submit">
                   {login ? "LOGIN" : "SIGN UP"}
                 </Button>
               )}
               {newPassword && (
-                <Button className="mb-3" variant="primary" type="submit">
+                <Button className="mb-3" id='loginBtn' type="submit">
                   SEND LINK
                 </Button>
               )}
