@@ -1,14 +1,17 @@
 import React from "react";
 import LOGIN from "./Components/Login/LOGIN";
-import { Switch,Route, Redirect } from "react-router-dom";
+import { Switch,Route, Redirect, useLocation } from "react-router-dom";
 import WELCOME from "./Components/Welcome/WELCOME";
 import { Provider } from "react-redux";
 import store from "./Components/Store/store";
 import ChangePassword from "./Components/Login/ChangePassword";
+import { AnimatePresence } from "framer-motion";
 const App = () => {
+  const location=useLocation()
   return (
     <Provider store={store}>
-        <Switch>
+      <AnimatePresence >
+        <Switch  location={location} key={location.key}>
           <Route path="/" exact>
             <LOGIN/>
           </Route>
@@ -22,6 +25,7 @@ const App = () => {
             <Redirect to='/WELCOME'/>
           </Route>
         </Switch>
+        </AnimatePresence>
     </Provider>
   );
 };
