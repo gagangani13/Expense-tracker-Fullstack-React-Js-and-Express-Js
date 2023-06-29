@@ -86,7 +86,7 @@ module.exports.viewDownloads=async(req,res,next)=>{
 
 module.exports.verifyPremium=async(req,res,next)=>{
     try {
-        const getUser=await User.findById(req.userId)
+        const getUser=await User.findByPk(req.userId)
         if (getUser.premium) {
             res.send({ok:true})
         }else{
