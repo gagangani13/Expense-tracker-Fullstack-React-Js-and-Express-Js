@@ -1,14 +1,20 @@
 {
   "files": {
 <<<<<<< HEAD
+<<<<<<< HEAD
     "main.css": "/static/css/main.dd1b62bf.css",
     "main.js": "/static/js/main.18d38bb0.js",
+=======
+    "main.css": "/static/css/main.aabeac8f.css",
+    "main.js": "/static/js/main.9938c772.js",
+>>>>>>> d1f0f4bf30f5518d4982f180e82d86adb40d1c27
     "static/media/money.jpg": "/static/media/money.01bd88edd1b1a4df1bda.jpg",
     "index.html": "/index.html",
-    "main.dd1b62bf.css.map": "/static/css/main.dd1b62bf.css.map",
-    "main.18d38bb0.js.map": "/static/js/main.18d38bb0.js.map"
+    "main.aabeac8f.css.map": "/static/css/main.aabeac8f.css.map",
+    "main.9938c772.js.map": "/static/js/main.9938c772.js.map"
   },
   "entrypoints": [
+<<<<<<< HEAD
     "static/css/main.dd1b62bf.css",
     "static/js/main.18d38bb0.js"
 =======
@@ -23,5 +29,9 @@
     "static/css/main.aabeac8f.css",
     "static/js/main.9938c772.js"
 >>>>>>> 45f2202 (changes)
+=======
+    "static/css/main.aabeac8f.css",
+    "static/js/main.9938c772.js"
+>>>>>>> d1f0f4bf30f5518d4982f180e82d86adb40d1c27
   ]
 }
