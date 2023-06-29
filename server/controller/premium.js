@@ -86,13 +86,13 @@ module.exports.viewDownloads=async(req,res,next)=>{
 
 module.exports.verifyPremium=async(req,res,next)=>{
     try {
-        const getUser=await User.findByPk(Number(req.userId))
+        const getUser=await User.findOne(Number(req.userId))
         if (getUser.premium) {
             res.send({ok:true})
         }else{
             throw new Error()
         }
     } catch (error) {
-        res.send({ok:false})
+        res.send({ok:false,error})
     }
 }
