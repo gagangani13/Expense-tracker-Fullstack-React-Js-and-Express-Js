@@ -36,7 +36,7 @@ app.use(router)
 
 //wrongUrl
 app.use('/',(req,res)=>{
-    res.redirect('http://3.83.190.214:3000/')
+    res.redirect('http://54.85.51.11:3000/')
 })
 
 database.sync().then(res=>app.listen(process.env.PORT)).catch(err=>console.log(err))
