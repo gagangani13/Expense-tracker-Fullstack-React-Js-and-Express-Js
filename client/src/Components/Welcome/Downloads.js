@@ -12,7 +12,7 @@ const Downloads = () => {
     // eslint-disable-next-line
   }, []);
   async function viewDownload() {
-    const response = await axios.get("http://54.85.51.11:5000/viewDownloads", {
+    const response = await axios.get("http://100.26.115.160:5000/viewDownloads", {
       headers: { Authorization: idToken },
     });
     const data = await response.data;

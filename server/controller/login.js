@@ -85,7 +85,7 @@ module.exports.forgotPassword = async (req, res, next) => {
     to: receiver,
     subject: "Change your password",
     textContent: "You can change your password here",
-    htmlContent: `<div><h1>Hello Boss</h1><a href="http://54.85.51.11:${process.env.PORT}/Password/${req.UUID}">Change your password here</a></div>`,
+    htmlContent: `<div><h1>Hello Boss</h1><a href="http://100.26.115.160:${process.env.PORT}/Password/${req.UUID}">Change your password here</a></div>`,
   });
   try {
     res.send({ ok: true, message: "Email sent" });

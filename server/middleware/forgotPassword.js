@@ -22,9 +22,9 @@ module.exports.validateForgotPasswordLink=async(req,res,next)=>{
         const UUID=req.params.Id
         const findPassword=await ForgotPassword.findOne({where:{id:UUID}})
         if (findPassword.isActive==1||null){
-            res.redirect(`http://54.85.51.11:3000/Password/${UUID}`)
+            res.redirect(`http://100.26.115.160:3000/Password/${UUID}`)
         }else{
-            res.send('<h1>The link has been expired. Please request via <a href="http://54.85.51.11:3000/">Expense Tracker</a></h1>')
+            res.send('<h1>The link has been expired. Please request via <a href="http://100.26.115.160:3000/">Expense Tracker</a></h1>')
         }
     } catch (error) {
         res.send({message:error})

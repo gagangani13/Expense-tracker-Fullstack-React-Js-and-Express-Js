@@ -7,7 +7,7 @@ const Leaderboard = () => {
   const [expenses, loadExpenses] = useState([]);
   const idToken = useSelector((state) => state.authenticate.idToken);
   async function leaderboardExpenses() {
-    const response = await axios.get("http://54.85.51.11:5000/allExpenses", {
+    const response = await axios.get("http://100.26.115.160:5000/allExpenses", {
       headers: { Authorization: idToken },
     });
     const data = await response.data.expenses;

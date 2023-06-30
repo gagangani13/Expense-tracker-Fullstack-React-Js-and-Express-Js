@@ -8,7 +8,7 @@ const ChangePassword = () => {
     const params=useParams()
     async function addData(e){
         e.preventDefault();
-        const response=await axios.post(`http://54.85.51.11:5000/updatePassword/${params.Id}`,{password:passwordRef.current.value})
+        const response=await axios.post(`http://100.26.115.160:5000/updatePassword/${params.Id}`,{password:passwordRef.current.value})
         const data=await response.data
         try {
             if (data.ok) {
